@@ -30,6 +30,7 @@ data/private/profiles/*.json
 data/private/error-logs/*.json
 data/private/session-history/*.json
 data/transcripts/private/
+private-chatgpt/
 
 # Keep starter docs in ignored private folders
 !data/private/README.md
