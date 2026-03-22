@@ -43,6 +43,13 @@ xcodebuild -project CostaRicaSpanishCoach.xcodeproj -scheme CostaRicaSpanishCoac
 xcodebuild -project CostaRicaSpanishCoach.xcodeproj -scheme CostaRicaSpanishCoach-iOS -destination 'generic/platform=iOS' build
 ```
 
+## Physical Devices
+
+- the `xcodebuild` commands above are verification checks and project-level builds
+- for a real iPhone, iPad, or Mac install, open the Xcode project, set signing, choose the physical device, and run from Xcode
+- after the app launches on-device, enter the shared backend LAN URL in the in-app connection screen
+- use [apple-client.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/setup/apple-client.md) as the canonical install guide
+
 ## Local-First Expectations
 
 - v1 should work without a public cloud backend

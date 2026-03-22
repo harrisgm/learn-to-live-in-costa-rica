@@ -6,6 +6,8 @@ Build an official SwiftUI client for iPhone, iPad, and Mac that feels polished a
 
 The first scaffold now lives in `app/apple/` and uses XcodeGen so the Xcode project stays reproducible in git.
 
+The v1 client is meant to be installed directly onto your personal household iPhones, iPads, and Macs, then configured against one shared local-network backend.
+
 ## Platform Strategy
 
 - one SwiftUI codebase should cover iPhone, iPad, and macOS as much as practical

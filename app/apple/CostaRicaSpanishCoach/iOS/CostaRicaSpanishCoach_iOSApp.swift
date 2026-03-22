@@ -5,6 +5,7 @@ struct CostaRicaSpanishCoach_iOSApp: App {
     var body: some Scene {
         WindowGroup {
             CoachRootView()
+                .tint(CoachVisuals.terracotta)
         }
     }
 }

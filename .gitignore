@@ -19,6 +19,12 @@ coverage/
 .DS_Store
 *.log
 
+# Xcode
+*.xcuserstate
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+
 # Local-only learner data
 data/private/profiles/*.json
 data/private/error-logs/*.json

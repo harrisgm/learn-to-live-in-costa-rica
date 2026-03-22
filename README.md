@@ -103,7 +103,13 @@ xcodegen generate
 open CostaRicaSpanishCoach.xcodeproj
 ```
 
-Set Apple signing in Xcode before running on physical devices.
+Then:
+
+1. Set your Apple signing/team in Xcode for the iOS and macOS targets.
+2. Run the app onto each real household device from Xcode the first time.
+3. Enter the shared backend LAN URL when the in-app connection screen appears.
+
+The full device-install flow lives in [docs/setup/apple-client.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/setup/apple-client.md).
 
 ## Contribution Workflow
 
