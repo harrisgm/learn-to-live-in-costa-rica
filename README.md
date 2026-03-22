@@ -138,6 +138,14 @@ Typical workflow:
 
 More detail lives in [docs/setup/repo-workflow.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/setup/repo-workflow.md).
 
+## Steward Thread Handoffs
+
+This repo now includes a lightweight stewardship layer for long-running Codex and ChatGPT collaboration:
+
+- [docs/stewardship/STEWARD_THREAD_HANDBOOK.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/STEWARD_THREAD_HANDBOOK.md): steward-thread role, source-of-truth order, handoff timing, and delegation expectations
+- [docs/stewardship/HANDOFF_CHECKLIST.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/HANDOFF_CHECKLIST.md): closeout and handoff checklist for milestone boundaries
+- [docs/chatgpt/README.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/README.md): source index for `00_MASTER_PLAN`, `08_PROGRESS_TRACKER`, and public-vs-private ChatGPT project files
+
 ## Public vs Private Data Rules
 
 Safe to keep in the public repo:

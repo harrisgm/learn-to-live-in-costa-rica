@@ -38,6 +38,11 @@ Build a practical Spanish-learning system and local-first coaching app for an Am
 - Treat `gh auth status`, `gh auth login`, `gh auth logout`, and similar auth-check commands as outside-sandbox operations
 - If a sandboxed `gh auth` check looks broken, retry with elevated permissions before attempting any re-auth flow
 
+## Stewardship
+- Use [`docs/stewardship/STEWARD_THREAD_HANDBOOK.md`](docs/stewardship/STEWARD_THREAD_HANDBOOK.md) for steward-thread ownership, handoff timing, and delegation expectations
+- Use [`docs/stewardship/HANDOFF_CHECKLIST.md`](docs/stewardship/HANDOFF_CHECKLIST.md) when closing a steward thread or handing off to a new one
+- Use [`docs/chatgpt/README.md`](docs/chatgpt/README.md) as the source index for ChatGPT project uploads and thread setup
+
 ## When Adding Features
 Always ask:
 1. Does this directly improve conversation ability?
