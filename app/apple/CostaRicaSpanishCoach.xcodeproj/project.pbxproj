@@ -28,6 +28,7 @@
 		CBAE4BF6AE2BDB26F3DB1CFC /* CoachViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6060887870EEA5765925F783 /* CoachViewModel.swift */; };
 		D9E060762E74C86385014E5A /* CostaRicaSpanishCoach_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DB178DEEC6DA3B1ABE05EA /* CostaRicaSpanishCoach_macOSApp.swift */; };
 		E52A546E8770D973A142AEBB /* ServerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D29263A9CB998D8A0837383 /* ServerSettingsView.swift */; };
+		E5CCD78A356ED596390AD38E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C12A4284202227CC00741D02 /* LaunchScreen.storyboard */; };
 		F1E9A5A56EC4809C04C32F5B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D11A27A477305BDE793E881F /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -43,12 +44,21 @@
 		9D29263A9CB998D8A0837383 /* ServerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsView.swift; sourceTree = "<group>"; };
 		A3FB5A0F1C0A2D5198BA8A07 /* CoachModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachModels.swift; sourceTree = "<group>"; };
 		A9195DE104C124B9E068EA9A /* SpeechPlaybackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechPlaybackService.swift; sourceTree = "<group>"; };
+		C12A4284202227CC00741D02 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D11A27A477305BDE793E881F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DB896BA2717A419E6542BE53 /* CoachVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachVisuals.swift; sourceTree = "<group>"; };
 		E1E908CE437AF0AFD152E43D /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		240381D4A8934D1A77EF4DB8 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C12A4284202227CC00741D02 /* LaunchScreen.storyboard */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		2F70B458DAC6F8460EC23FD8 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				217E6C05E74BB26F2158D0C1 /* CostaRicaSpanishCoach_iOSApp.swift */,
+				240381D4A8934D1A77EF4DB8 /* Resources */,
 			);
 			name = iOS;
 			path = CostaRicaSpanishCoach/iOS;
@@ -191,6 +202,14 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					24F549FEEAFBE86FEDD1BDAF = {
+						ProvisioningStyle = Automatic;
+					};
+					40D0DF336608A9C59A579DA2 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = 67C555A4695DEEE67F00BFC9 /* Build configuration list for PBXProject "CostaRicaSpanishCoach" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -227,6 +246,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAEC8F67FE8D316F7DEC56CD /* Assets.xcassets in Resources */,
+				E5CCD78A356ED596390AD38E /* LaunchScreen.storyboard in Resources */,
 				2E068F70137E2A9131175029 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -273,6 +293,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
@@ -291,12 +312,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Costa Rica Coach";
 				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Connect to your shared coach server on your home network so the app can load scenarios, save sessions, and run AI feedback.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record short Spanish practice audio to send to your shared coach server for transcription.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = (
 					UIInterfaceOrientationPortrait,
 					UIInterfaceOrientationPortraitUpsideDown,
@@ -315,6 +337,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.harrisgm.costaricaspanishcoach.ios;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -352,8 +375,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -383,6 +404,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
@@ -429,8 +451,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -468,12 +488,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Costa Rica Coach";
 				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Connect to your shared coach server on your home network so the app can load scenarios, save sessions, and run AI feedback.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record short Spanish practice audio to send to your shared coach server for transcription.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = (
 					UIInterfaceOrientationPortrait,
 					UIInterfaceOrientationPortraitUpsideDown,
@@ -492,6 +513,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.harrisgm.costaricaspanishcoach.ios;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

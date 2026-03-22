@@ -106,10 +106,15 @@ open CostaRicaSpanishCoach.xcodeproj
 Then:
 
 1. Set your Apple signing/team in Xcode for the iOS and macOS targets.
-2. Run the app onto each real household device from Xcode the first time.
-3. Enter the shared backend LAN URL when the in-app connection screen appears.
+2. Use the `CostaRicaSpanishCoach-iOS` scheme for iPhone and iPad installs.
+3. Use the `CostaRicaSpanishCoach-macOS` scheme for Macs, not `My Mac (Designed for iPad)`.
+4. Run the app onto each real household device from Xcode the first time.
+5. Enter the shared backend LAN URL when the in-app connection screen appears.
+
+If you only want a compile check from the command line before choosing a signing team, use a temporary `CODE_SIGNING_ALLOWED=NO` override instead of changing the project defaults.
 
 The full device-install flow lives in [docs/setup/apple-client.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/setup/apple-client.md).
+Archive/export guidance for later household distribution lives in [docs/setup/apple-distribution.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/setup/apple-distribution.md).
 
 ## Contribution Workflow
 
@@ -169,5 +174,11 @@ The web app now includes a practical v1 foundation:
 - use OpenAI-backed correction/transcription when `OPENAI_API_KEY` is set, with a local rules fallback otherwise
 
 The native Apple client is now scaffolded under `app/apple/` with a shared SwiftUI codebase, LAN-server configuration, native microphone capture, speech playback, and shared session browsing against the same backend contract as the web app.
+
+Brand assets for the Apple client can be regenerated with:
+
+```bash
+swift scripts/generate-apple-brand-assets.swift
+```
 
 This keeps the app honest: real backend plumbing is present now, but the UX is still centered on correction, roleplay, and steady learning progress instead of premature platform sprawl.

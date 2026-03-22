@@ -28,6 +28,7 @@ The v1 client is meant to be installed directly onto your personal household iPh
 - the native app should call the same bootstrap, coaching, session, and transcription endpoints as the web client
 - learner profiles, scenario catalogs, and session history should stay in the shared backend and database
 - speech input should still degrade gracefully if the transcription service is unavailable
+- Macs should use the native macOS target rather than the iPad-on-Mac compatibility path
 
 ## Current Scope
 

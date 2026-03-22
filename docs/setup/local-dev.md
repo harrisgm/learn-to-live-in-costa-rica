@@ -39,16 +39,20 @@ npm run typecheck
 ```bash
 cd app/apple
 xcodegen generate
-xcodebuild -project CostaRicaSpanishCoach.xcodeproj -scheme CostaRicaSpanishCoach-macOS -destination 'platform=macOS' build
-xcodebuild -project CostaRicaSpanishCoach.xcodeproj -scheme CostaRicaSpanishCoach-iOS -destination 'generic/platform=iOS' build
+swift ../../scripts/generate-apple-brand-assets.swift
+xcodebuild -project CostaRicaSpanishCoach.xcodeproj -scheme CostaRicaSpanishCoach-macOS -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build
+xcodebuild -project CostaRicaSpanishCoach.xcodeproj -scheme CostaRicaSpanishCoach-iOS -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
 ```
 
 ## Physical Devices
 
 - the `xcodebuild` commands above are verification checks and project-level builds
-- for a real iPhone, iPad, or Mac install, open the Xcode project, set signing, choose the physical device, and run from Xcode
+- for a real iPhone or iPad install, open the Xcode project, choose the `CostaRicaSpanishCoach-iOS` scheme, set signing, choose the physical device, and run from Xcode
+- for a real Mac install, use the `CostaRicaSpanishCoach-macOS` scheme and the normal `My Mac` destination
+- avoid `My Mac (Designed for iPad)` when you want the native desktop app
 - after the app launches on-device, enter the shared backend LAN URL in the in-app connection screen
 - use [apple-client.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/setup/apple-client.md) as the canonical install guide
+- use [apple-distribution.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/setup/apple-distribution.md) once you want repeatable archives instead of direct Xcode installs
 
 ## Local-First Expectations
 

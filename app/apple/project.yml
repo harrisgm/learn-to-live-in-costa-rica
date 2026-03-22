@@ -10,8 +10,6 @@ settings:
     SWIFT_VERSION: 6.0
     CURRENT_PROJECT_VERSION: 1
     MARKETING_VERSION: 0.1.0
-    CODE_SIGNING_ALLOWED: NO
-    CODE_SIGNING_REQUIRED: NO
 targets:
   CostaRicaSpanishCoach-iOS:
     type: application
@@ -22,11 +20,13 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.harrisgm.costaricaspanishcoach.ios
+        CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Costa Rica Coach
         INFOPLIST_KEY_NSLocalNetworkUsageDescription: Connect to your shared coach server on your home network so the app can load scenarios, save sessions, and run AI feedback.
         INFOPLIST_KEY_NSMicrophoneUsageDescription: Record short Spanish practice audio to send to your shared coach server for transcription.
         INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking: YES
+        INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
@@ -36,7 +36,7 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
         SUPPORTS_MACCATALYST: NO
         TARGETED_DEVICE_FAMILY: "1,2"
   CostaRicaSpanishCoach-macOS:
@@ -48,6 +48,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.harrisgm.costaricaspanishcoach.macos
+        CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_NSMicrophoneUsageDescription: Record short Spanish practice audio to send to your shared coach server for transcription.
         INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking: YES
