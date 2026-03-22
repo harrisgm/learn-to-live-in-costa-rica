@@ -1,0 +1,16 @@
+{
+  "id": "grocery",
+  "title": "Grocery Store",
+  "setting": "Neighborhood market in Costa Rica",
+  "difficulty": "beginner",
+  "userGoal": "Ask for basic items, prices, and quantities.",
+  "mustKnowVocabulary": ["frijoles", "arroz", "cuanto cuesta", "medio kilo"],
+  "starterPrompts": [
+    "Necesito comprar arroz y frijoles.",
+    "Cuanto cuesta un kilo de tomates?"
+  ],
+  "culturalNotes": [
+    "Polite greetings still matter in quick transactions.",
+    "Expect natural-speed answers when prices are listed."
+  ]
+}

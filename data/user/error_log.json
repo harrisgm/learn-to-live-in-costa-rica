@@ -1,0 +1,13 @@
+{
+  "learnerId": "shared-template",
+  "generatedAt": "2026-03-21T00:00:00Z",
+  "items": [
+    {
+      "tag": "literal-translation",
+      "description": "Using English sentence structure too directly in Spanish.",
+      "example": "Yo soy muy caliente.",
+      "recurrenceCount": 0,
+      "lastSeen": "2026-03-21T00:00:00Z"
+    }
+  ]
+}

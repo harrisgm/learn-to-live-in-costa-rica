@@ -1,0 +1,24 @@
+{
+  "id": "housing-vocab",
+  "title": "Housing and Rental Vocabulary",
+  "entries": [
+    {
+      "spanish": "alquiler",
+      "english": "rent",
+      "tags": ["housing", "cost"],
+      "example": "Cual es el alquiler mensual?"
+    },
+    {
+      "spanish": "deposito",
+      "english": "deposit",
+      "tags": ["housing", "paperwork"],
+      "example": "Cuanto es el deposito?"
+    },
+    {
+      "spanish": "servicios incluidos",
+      "english": "utilities included",
+      "tags": ["housing", "utilities"],
+      "example": "Los servicios estan incluidos?"
+    }
+  ]
+}

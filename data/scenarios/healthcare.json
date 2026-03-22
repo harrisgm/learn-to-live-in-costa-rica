@@ -1,0 +1,16 @@
+{
+  "id": "healthcare",
+  "title": "Pharmacy or Clinic",
+  "setting": "Pharmacy counter or basic clinic visit",
+  "difficulty": "beginner+",
+  "userGoal": "Explain symptoms, ask for help, and understand simple instructions.",
+  "mustKnowVocabulary": ["dolor", "medicina", "receta", "fiebre", "cita"],
+  "starterPrompts": [
+    "Tengo dolor de cabeza desde ayer.",
+    "Que medicina me recomienda?"
+  ],
+  "culturalNotes": [
+    "Healthcare language should stay simple and precise.",
+    "Learners should practice symptoms, timing, and basic instructions."
+  ]
+}

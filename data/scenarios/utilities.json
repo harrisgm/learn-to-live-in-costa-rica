@@ -1,0 +1,16 @@
+{
+  "id": "utilities",
+  "title": "Utilities and Internet",
+  "setting": "Household service call or chat",
+  "difficulty": "beginner+",
+  "userGoal": "Ask about water, electricity, and internet problems or setup.",
+  "mustKnowVocabulary": ["luz", "agua", "internet", "corte", "servicio"],
+  "starterPrompts": [
+    "No tenemos internet hoy.",
+    "Cuando pueden revisar el problema?"
+  ],
+  "culturalNotes": [
+    "Service interruptions are practical topics in daily life.",
+    "Short, direct questions are often the most useful."
+  ]
+}

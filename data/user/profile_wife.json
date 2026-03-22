@@ -1,0 +1,20 @@
+{
+  "id": "learner-wife-template",
+  "displayName": "Learner B",
+  "learnerLevel": "beginner+",
+  "goals": [
+    "Move from survival Spanish toward natural conversation.",
+    "Support partner practice through couple drills.",
+    "Handle daily-life tasks with less hesitation."
+  ],
+  "strengths": [
+    "Already has practical survival exposure.",
+    "Can model short conversations for partner practice."
+  ],
+  "challenges": [
+    "Needs more natural phrasing.",
+    "Needs better comprehension of fast local speech."
+  ],
+  "confidenceNotes": "Can handle more realism but still benefits from focused correction.",
+  "privacyLevel": "public-template"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "couple-practice-vocab",
+  "title": "Couple Practice Vocabulary",
+  "entries": [
+    {
+      "spanish": "Te toca a ti.",
+      "english": "It is your turn.",
+      "tags": ["couple-mode", "practice"],
+      "example": "Yo hago la pregunta y luego te toca a ti."
+    },
+    {
+      "spanish": "Puedes repetir mas despacio?",
+      "english": "Can you repeat more slowly?",
+      "tags": ["couple-mode", "listening"],
+      "example": "Puedes repetir mas despacio, por favor?"
+    },
+    {
+      "spanish": "Intentemos otra vez.",
+      "english": "Let us try again.",
+      "tags": ["couple-mode", "encouragement"],
+      "example": "Intentemos otra vez con una respuesta mas larga."
+    }
+  ]
+}

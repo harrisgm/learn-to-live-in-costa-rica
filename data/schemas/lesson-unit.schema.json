@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://learn-to-live-in-costa-rica.local/schemas/lesson-unit.schema.json",
+  "title": "Lesson Unit",
+  "type": "object",
+  "required": ["unitId", "title", "week", "level", "objectives", "activities"],
+  "properties": {
+    "unitId": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "week": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "level": {
+      "type": "string"
+    },
+    "objectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "activities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "title", "instructions"],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "instructions": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "review": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

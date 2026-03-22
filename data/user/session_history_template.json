@@ -1,0 +1,18 @@
+{
+  "learnerId": "shared-template",
+  "sessions": [
+    {
+      "id": "session-template-001",
+      "createdAt": "2026-03-21T00:00:00Z",
+      "mode": "tutor",
+      "difficulty": "beginner",
+      "scenario": "grocery",
+      "userInput": "Yo necesito dos tomates y arroz.",
+      "correctedSpanish": "Necesito dos tomates y arroz.",
+      "naturalSpanish": "Quisiera dos tomates y un poco de arroz, por favor.",
+      "explanation": "The sentence works, but beginner feedback removes the unnecessary subject pronoun and improves politeness.",
+      "errorTags": ["register", "subject-pronoun-overuse"],
+      "confidenceScore": 0.45
+    }
+  ]
+}

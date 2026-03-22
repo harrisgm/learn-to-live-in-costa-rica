@@ -1,0 +1,24 @@
+{
+  "id": "core-vocab-master",
+  "title": "Core Vocabulary Master",
+  "entries": [
+    {
+      "spanish": "Necesito ayuda.",
+      "english": "I need help.",
+      "tags": ["survival", "daily-life"],
+      "example": "Necesito ayuda con este formulario."
+    },
+    {
+      "spanish": "Cuanto cuesta?",
+      "english": "How much does it cost?",
+      "tags": ["shopping", "money"],
+      "example": "Cuanto cuesta esta fruta?"
+    },
+    {
+      "spanish": "No entiendo bien.",
+      "english": "I do not understand well.",
+      "tags": ["repair", "listening"],
+      "example": "Perdon, no entiendo bien."
+    }
+  ]
+}

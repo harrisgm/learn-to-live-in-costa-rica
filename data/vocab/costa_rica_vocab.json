@@ -1,0 +1,24 @@
+{
+  "id": "costa-rica-vocab",
+  "title": "Costa Rica Daily Life Vocabulary",
+  "entries": [
+    {
+      "spanish": "pulperia",
+      "english": "corner store",
+      "tags": ["costa-rica", "shopping"],
+      "example": "Voy a la pulperia de la esquina."
+    },
+    {
+      "spanish": "mandado",
+      "english": "errand or grocery run",
+      "tags": ["costa-rica", "daily-life"],
+      "example": "Tengo que hacer un mandado."
+    },
+    {
+      "spanish": "Que dicha",
+      "english": "That is great / what a relief",
+      "tags": ["costa-rica", "expression"],
+      "example": "Que dicha que llegamos temprano."
+    }
+  ]
+}

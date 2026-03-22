@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", "Trebuchet MS", sans-serif;
+  --font-serif: "Iowan Old Style", "Baskerville", "Palatino Linotype", "Book Antiqua", serif;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-sans), sans-serif;
+  color: #51352b;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-[2rem] border border-coffee/10 bg-white/75 p-6 shadow-card backdrop-blur;
+  }
+
+  .pill {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em];
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.28em] text-terracotta;
+  }
+
+  .hero-title {
+    font-family: var(--font-serif), serif;
+    @apply mt-3 max-w-4xl text-5xl font-semibold leading-tight text-coffee md:text-6xl;
+  }
+
+  .section-title {
+    font-family: var(--font-serif), serif;
+    @apply mt-2 text-3xl font-semibold leading-tight text-coffee;
+  }
+
+  .field {
+    @apply flex flex-col gap-2 text-sm font-medium text-coffee;
+  }
+
+  .field select {
+    @apply rounded-[1rem] border border-coffee/15 bg-white/85 px-4 py-3 text-base font-medium text-coffee outline-none transition focus:border-terracotta focus:ring-2 focus:ring-terracotta/20;
+  }
+
+  .feedback-block {
+    @apply rounded-[1.35rem] border border-coffee/10 bg-sand/45 px-4 py-3;
+  }
+
+  .feedback-block span {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-palm;
+  }
+
+  .feedback-block p {
+    @apply mt-2 text-sm leading-6 text-coffee/80;
+  }
+}

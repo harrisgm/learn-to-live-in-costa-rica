@@ -1,0 +1,16 @@
+{
+  "id": "bank",
+  "title": "Bank Visit",
+  "setting": "Bank counter or customer service desk",
+  "difficulty": "intermediate",
+  "userGoal": "Ask for account, transfer, and document help.",
+  "mustKnowVocabulary": ["cuenta", "transferencia", "estado de cuenta", "documento"],
+  "starterPrompts": [
+    "Necesito ayuda con una transferencia.",
+    "Que documentos necesito para abrir una cuenta?"
+  ],
+  "culturalNotes": [
+    "This scenario benefits from repair phrases and clarification requests.",
+    "Formal language may be more helpful than casual phrasing."
+  ]
+}

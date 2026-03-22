@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://learn-to-live-in-costa-rica.local/schemas/session-history.schema.json",
+  "title": "Session History",
+  "type": "object",
+  "required": ["learnerId", "sessions"],
+  "properties": {
+    "learnerId": {
+      "type": "string"
+    },
+    "sessions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "mode",
+          "difficulty",
+          "userInput",
+          "correctedSpanish",
+          "naturalSpanish",
+          "explanation",
+          "errorTags"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "difficulty": {
+            "type": "string"
+          },
+          "scenario": {
+            "type": "string"
+          },
+          "userInput": {
+            "type": "string"
+          },
+          "correctedSpanish": {
+            "type": "string"
+          },
+          "naturalSpanish": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "errorTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidenceScore": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

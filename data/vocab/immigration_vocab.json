@@ -1,0 +1,24 @@
+{
+  "id": "immigration-vocab",
+  "title": "Immigration and Paperwork Vocabulary",
+  "entries": [
+    {
+      "spanish": "tramite",
+      "english": "process or procedure",
+      "tags": ["immigration", "paperwork"],
+      "example": "Estoy haciendo un tramite."
+    },
+    {
+      "spanish": "requisito",
+      "english": "requirement",
+      "tags": ["immigration", "paperwork"],
+      "example": "Cual es el requisito principal?"
+    },
+    {
+      "spanish": "cita",
+      "english": "appointment",
+      "tags": ["immigration", "schedule"],
+      "example": "Tengo una cita manana."
+    }
+  ]
+}

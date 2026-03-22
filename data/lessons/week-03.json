@@ -1,0 +1,33 @@
+{
+  "unitId": "week-03",
+  "title": "Week 3 Housing Basics",
+  "week": 3,
+  "level": "beginner+",
+  "objectives": [
+    "Ask about rent, utilities, and move-in details.",
+    "Practice short housing questions without translating word-for-word.",
+    "Handle a landlord or property-manager exchange."
+  ],
+  "activities": [
+    {
+      "type": "dialogue",
+      "title": "Housing Questions",
+      "instructions": "Practice asking what is included in rent and when a property can be seen."
+    },
+    {
+      "type": "writing",
+      "title": "Message to a Landlord",
+      "instructions": "Draft a short WhatsApp-style message asking for basic rental information."
+    },
+    {
+      "type": "roleplay",
+      "title": "Rental Walkthrough",
+      "instructions": "Ask about water, internet, deposit, and repair expectations."
+    }
+  ],
+  "review": [
+    "housing vocabulary",
+    "included versus extra costs",
+    "polite follow-up questions"
+  ]
+}

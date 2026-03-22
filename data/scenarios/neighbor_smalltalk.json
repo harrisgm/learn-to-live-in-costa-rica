@@ -1,0 +1,16 @@
+{
+  "id": "neighbor-smalltalk",
+  "title": "Neighbor Small Talk",
+  "setting": "Friendly conversation with neighbors",
+  "difficulty": "beginner+",
+  "userGoal": "Build rapport and handle short everyday exchanges.",
+  "mustKnowVocabulary": ["mucho gusto", "de donde son", "por aqui", "que dicha"],
+  "starterPrompts": [
+    "Somos nuevos por aqui.",
+    "Estamos aprendiendo espanol porque queremos vivir aqui."
+  ],
+  "culturalNotes": [
+    "Warmth matters as much as grammar in social exchanges.",
+    "Small talk is a useful bridge into deeper local relationships."
+  ]
+}

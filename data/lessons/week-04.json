@@ -1,0 +1,33 @@
+{
+  "unitId": "week-04",
+  "title": "Week 4 Local Life and Repairs",
+  "week": 4,
+  "level": "beginner+",
+  "objectives": [
+    "Ask for help with basic repairs or services.",
+    "Talk about a problem clearly and simply.",
+    "Keep a practical conversation going when you do not understand every word."
+  ],
+  "activities": [
+    {
+      "type": "dialogue",
+      "title": "Describe a Problem",
+      "instructions": "Practice describing a leak, outage, or broken item using simple Spanish."
+    },
+    {
+      "type": "listening",
+      "title": "Fast Local Reply",
+      "instructions": "Listen to a short rapid reply and identify the one detail you need to answer."
+    },
+    {
+      "type": "roleplay",
+      "title": "Service Call",
+      "instructions": "Ask a contractor or service worker about timing, cost, and next steps."
+    }
+  ],
+  "review": [
+    "problem description",
+    "timing and cost questions",
+    "repair vocabulary"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://learn-to-live-in-costa-rica.local/schemas/error-log.schema.json",
+  "title": "Error Log",
+  "type": "object",
+  "required": ["learnerId", "generatedAt", "items"],
+  "properties": {
+    "learnerId": {
+      "type": "string"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tag", "description", "recurrenceCount"],
+        "properties": {
+          "tag": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "example": {
+            "type": "string"
+          },
+          "recurrenceCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lastSeen": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

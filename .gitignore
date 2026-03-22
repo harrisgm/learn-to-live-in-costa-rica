@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Build outputs
+dist/
+coverage/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS / editor noise
+.DS_Store
+*.log
+
+# Local-only learner data
+data/private/profiles/*.json
+data/private/error-logs/*.json
+data/private/session-history/*.json
+data/transcripts/private/
+
+# Keep starter docs in ignored private folders
+!data/private/README.md
+!data/private/profiles/.gitkeep
+!data/private/error-logs/.gitkeep
+!data/private/session-history/.gitkeep

@@ -1,0 +1,16 @@
+{
+  "id": "immigration",
+  "title": "Immigration Office",
+  "setting": "Government office or service counter",
+  "difficulty": "intermediate",
+  "userGoal": "Ask about forms, requirements, and next steps with formal Spanish.",
+  "mustKnowVocabulary": ["formulario", "requisito", "cita", "tramite", "documento"],
+  "starterPrompts": [
+    "Que documentos necesito para este tramite?",
+    "Cual es el siguiente paso?"
+  ],
+  "culturalNotes": [
+    "This scenario rewards polite, formal language.",
+    "Learners should practice repair phrases and clarifying questions."
+  ]
+}

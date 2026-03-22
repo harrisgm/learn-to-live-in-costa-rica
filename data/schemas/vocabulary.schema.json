@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://learn-to-live-in-costa-rica.local/schemas/vocabulary.schema.json",
+  "title": "Vocabulary Pack",
+  "type": "object",
+  "required": ["id", "title", "entries"],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["spanish", "english", "tags"],
+        "properties": {
+          "spanish": {
+            "type": "string"
+          },
+          "english": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "example": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

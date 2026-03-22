@@ -1,0 +1,16 @@
+{
+  "id": "landlord",
+  "title": "Landlord Conversation",
+  "setting": "Rental or housing discussion",
+  "difficulty": "beginner+",
+  "userGoal": "Ask about rent, repairs, and move-in details.",
+  "mustKnowVocabulary": ["alquiler", "deposito", "arreglar", "incluido"],
+  "starterPrompts": [
+    "El alquiler incluye agua o internet?",
+    "Cuando podemos ver la propiedad?"
+  ],
+  "culturalNotes": [
+    "Housing conversations may become fast when discussing practical details.",
+    "Clarifying included utilities is a high-value skill."
+  ]
+}

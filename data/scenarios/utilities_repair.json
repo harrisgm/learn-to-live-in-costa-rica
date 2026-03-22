@@ -1,0 +1,16 @@
+{
+  "id": "utilities-repair",
+  "title": "Utility Repair Visit",
+  "setting": "Technician visit for home utilities or internet",
+  "difficulty": "beginner+",
+  "userGoal": "Describe a problem, confirm timing, and ask what the technician needs.",
+  "mustKnowVocabulary": ["revisar", "problema", "corte", "senal", "cita"],
+  "starterPrompts": [
+    "La internet no funciona en esta casa.",
+    "Puede venir hoy o manana?"
+  ],
+  "culturalNotes": [
+    "Keep descriptions short and practical.",
+    "A good outcome is confirming the next action clearly."
+  ]
+}

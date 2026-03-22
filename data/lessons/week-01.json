@@ -1,0 +1,33 @@
+{
+  "unitId": "week-01",
+  "title": "Week 1 Foundations",
+  "week": 1,
+  "level": "beginner",
+  "objectives": [
+    "Introduce yourself simply.",
+    "Ask for help and repetition.",
+    "Handle a basic grocery exchange."
+  ],
+  "activities": [
+    {
+      "type": "dialogue",
+      "title": "Greeting Drill",
+      "instructions": "Practice a three-line greeting exchange with your partner."
+    },
+    {
+      "type": "writing",
+      "title": "Mini Introduction",
+      "instructions": "Write four sentences about who you are and why you are learning Spanish."
+    },
+    {
+      "type": "roleplay",
+      "title": "Market Basics",
+      "instructions": "Ask for two items, their price, and the total."
+    }
+  ],
+  "review": [
+    "greetings",
+    "numbers",
+    "polite repair phrases"
+  ]
+}

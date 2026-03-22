@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://learn-to-live-in-costa-rica.local/schemas/scenario.schema.json",
+  "title": "Scenario",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "setting",
+    "difficulty",
+    "userGoal",
+    "mustKnowVocabulary",
+    "starterPrompts"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "setting": {
+      "type": "string"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["beginner", "beginner+", "intermediate", "natural", "costa-rica-fast"]
+    },
+    "userGoal": {
+      "type": "string"
+    },
+    "mustKnowVocabulary": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "starterPrompts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "culturalNotes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

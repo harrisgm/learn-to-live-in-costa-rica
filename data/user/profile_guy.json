@@ -1,0 +1,20 @@
+{
+  "id": "learner-guy-template",
+  "displayName": "Learner A",
+  "learnerLevel": "beginner",
+  "goals": [
+    "Build confidence speaking from zero.",
+    "Handle everyday Costa Rica interactions.",
+    "Understand locals at increasing speed."
+  ],
+  "strengths": [
+    "Motivated by a concrete three-year goal.",
+    "Willing to practice consistently."
+  ],
+  "challenges": [
+    "Very limited active Spanish.",
+    "May freeze when responses come quickly."
+  ],
+  "confidenceNotes": "Needs gentle correction and clear wins early.",
+  "privacyLevel": "public-template"
+}

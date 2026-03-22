@@ -1,0 +1,24 @@
+{
+  "id": "utilities-vocab",
+  "title": "Utilities Vocabulary",
+  "entries": [
+    {
+      "spanish": "luz",
+      "english": "electricity",
+      "tags": ["utilities", "home"],
+      "example": "Se fue la luz."
+    },
+    {
+      "spanish": "agua",
+      "english": "water",
+      "tags": ["utilities", "home"],
+      "example": "No hay agua en la casa."
+    },
+    {
+      "spanish": "internet",
+      "english": "internet",
+      "tags": ["utilities", "home"],
+      "example": "Necesitamos revisar el internet."
+    }
+  ]
+}

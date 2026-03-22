@@ -1,0 +1,33 @@
+{
+  "unitId": "week-02",
+  "title": "Week 2 Everyday Needs",
+  "week": 2,
+  "level": "beginner",
+  "objectives": [
+    "Ask for repetition and clarification politely.",
+    "Use basic needs language for errands and simple requests.",
+    "Handle a short grocery or corner-store exchange."
+  ],
+  "activities": [
+    {
+      "type": "dialogue",
+      "title": "Clarification Practice",
+      "instructions": "Practice asking someone to repeat more slowly, then restate the idea in your own words."
+    },
+    {
+      "type": "vocabulary",
+      "title": "Needs and Requests",
+      "instructions": "Review high-value phrases for help, prices, and quantities."
+    },
+    {
+      "type": "roleplay",
+      "title": "Corner Store Run",
+      "instructions": "Ask for two everyday items, confirm the price, and thank the clerk."
+    }
+  ],
+  "review": [
+    "help phrases",
+    "numbers and prices",
+    "slow repetition requests"
+  ]
+}

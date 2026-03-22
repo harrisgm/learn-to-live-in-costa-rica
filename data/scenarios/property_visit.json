@@ -1,0 +1,16 @@
+{
+  "id": "property-visit",
+  "title": "Property Visit",
+  "setting": "In-person house or land visit",
+  "difficulty": "intermediate",
+  "userGoal": "Ask about the condition, water, access, and neighborhood.",
+  "mustKnowVocabulary": ["lote", "servicios", "vecindario", "entrada"],
+  "starterPrompts": [
+    "Como es el acceso durante la temporada de lluvia?",
+    "Hay problemas con el agua o la electricidad?"
+  ],
+  "culturalNotes": [
+    "Property conversations often require follow-up questions and clarification.",
+    "Learners should practice descriptive and comparison language here."
+  ]
+}

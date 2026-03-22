@@ -1,0 +1,24 @@
+{
+  "id": "healthcare-vocab",
+  "title": "Healthcare Vocabulary",
+  "entries": [
+    {
+      "spanish": "dolor",
+      "english": "pain",
+      "tags": ["health", "symptoms"],
+      "example": "Tengo dolor de garganta."
+    },
+    {
+      "spanish": "fiebre",
+      "english": "fever",
+      "tags": ["health", "symptoms"],
+      "example": "Creo que tengo fiebre."
+    },
+    {
+      "spanish": "receta",
+      "english": "prescription",
+      "tags": ["health", "pharmacy"],
+      "example": "Necesito una receta?"
+    }
+  ]
+}

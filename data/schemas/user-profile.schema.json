@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://learn-to-live-in-costa-rica.local/schemas/user-profile.schema.json",
+  "title": "User Profile",
+  "type": "object",
+  "required": [
+    "id",
+    "displayName",
+    "learnerLevel",
+    "goals",
+    "strengths",
+    "challenges",
+    "privacyLevel"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "learnerLevel": {
+      "type": "string",
+      "enum": ["beginner", "beginner+", "intermediate", "natural"]
+    },
+    "goals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "strengths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "challenges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidenceNotes": {
+      "type": "string"
+    },
+    "privacyLevel": {
+      "type": "string",
+      "enum": ["public-template", "private-local"]
+    }
+  },
+  "additionalProperties": false
+}
