@@ -118,6 +118,7 @@ Before ending or handing off a steward thread, leave a compact record of:
 - next recommended action
 
 Use [HANDOFF_CHECKLIST.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/HANDOFF_CHECKLIST.md) for the operational checklist.
+Use [HANDOFF_SUMMARY_TEMPLATE.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/HANDOFF_SUMMARY_TEMPLATE.md) for the actual one-screen handoff note.
 
 ## ChatGPT Project Alignment
 

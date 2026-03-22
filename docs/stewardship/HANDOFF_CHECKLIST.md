@@ -71,7 +71,7 @@ Use this checklist when closing a steward thread or preparing a clean handoff in
 
 ## Short Handoff Summary
 
-Write a short handoff note at the bottom with:
+Write a short handoff note at the bottom using [HANDOFF_SUMMARY_TEMPLATE.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/HANDOFF_SUMMARY_TEMPLATE.md) with:
 
 - what changed
 - what is stable

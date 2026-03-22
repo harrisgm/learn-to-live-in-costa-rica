@@ -116,5 +116,6 @@ Use:
 
 - [../stewardship/STEWARD_THREAD_HANDBOOK.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/STEWARD_THREAD_HANDBOOK.md)
 - [../stewardship/HANDOFF_CHECKLIST.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/HANDOFF_CHECKLIST.md)
+- [../stewardship/HANDOFF_SUMMARY_TEMPLATE.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/HANDOFF_SUMMARY_TEMPLATE.md)
 
 when opening, running, or closing a steward thread.
