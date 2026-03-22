@@ -54,3 +54,10 @@
 - evaluate an iPhone-native client or wrapper if it improves offline and household usage
 - keep server APIs portable so a future native client can reuse the same backend
 - decide on-device versus server-heavy AI only after the text and speech loop is stable
+
+## Milestone 7: Official Apple Client
+
+- generate a SwiftUI iOS/macOS app with XcodeGen
+- connect the app to the shared LAN backend
+- polish the native experience for iPhone, iPad, and Mac
+- keep the native and web clients on the same product contract

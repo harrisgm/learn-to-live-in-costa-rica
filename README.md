@@ -9,7 +9,8 @@ This repository is the operating system for the project:
 - a clean curriculum and scenario structure
 - reusable prompt packs for tutoring, correction, and roleplay
 - structured data for profiles, lessons, vocabulary, and session history
-- a shared local-network web app with text coaching, speech hooks, and durable session storage
+- a shared local-network backend with text coaching, speech hooks, and durable session storage
+- a native SwiftUI Apple client for iPhone, iPad, and Mac that talks to the same backend
 
 The repo is designed so public, reusable assets can live in version control while private learner data stays local.
 
@@ -53,6 +54,8 @@ Key directories:
 - `worksheets/`: printable, quiz, dictation, and speaking-drill content
 - `app/web/`: minimal Next.js + TypeScript + Tailwind web app
 - `app/web/src/app/api/`: backend routes for bootstrap, coaching, sessions, and speech transcription
+- `app/apple/`: XcodeGen-powered SwiftUI iOS/macOS app scaffold
+- `docs/product/native-client.md`: native Apple client product notes
 - `app/shared/`: shared types, utilities, and validators for future multi-app reuse
 - `scripts/`: seed, export, transcript, and lesson generation helpers
 - `exports/`: generated study packs and printable outputs
@@ -91,6 +94,16 @@ npm run dev:network
 ```
 
 Then open [http://localhost:3000](http://localhost:3000) on the server machine, or `http://<server-lan-ip>:3000` from phones and laptops on the same network.
+
+### 5. Generate and open the Apple client
+
+```bash
+cd app/apple
+xcodegen generate
+open CostaRicaSpanishCoach.xcodeproj
+```
+
+Set Apple signing in Xcode before running on physical devices.
 
 ## Contribution Workflow
 
@@ -148,5 +161,7 @@ The web app now includes a practical v1 foundation:
 - fall back to in-memory sessions if Postgres is not configured yet
 - capture microphone audio in the browser and send it to a transcription route
 - use OpenAI-backed correction/transcription when `OPENAI_API_KEY` is set, with a local rules fallback otherwise
+
+The native Apple client is now scaffolded under `app/apple/` with a shared SwiftUI codebase, LAN-server configuration, native microphone capture, speech playback, and shared session browsing against the same backend contract as the web app.
 
 This keeps the app honest: real backend plumbing is present now, but the UX is still centered on correction, roleplay, and steady learning progress instead of premature platform sprawl.

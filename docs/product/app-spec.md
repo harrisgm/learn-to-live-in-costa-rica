@@ -81,3 +81,11 @@ Each session should be able to capture:
 - one shared server can run on a separate Windows 11 machine on the local network
 - phones, MacBooks, and other computers should connect to the same backend
 - the app should continue to work if audio is unavailable, since text-first practice is the primary v1 loop
+
+## Native Apple Client
+
+- the first official Apple client should be a SwiftUI app that targets iPhone, iPad, and Mac from one codebase
+- use Xcode and XcodeGen so the project stays reproducible and easy to open in Xcode
+- keep the UI polished, native-feeling, and fast to launch on Apple devices
+- let the client talk only to the shared backend API instead of duplicating business logic locally
+- keep the server contracts stable so the Apple client and the web client can share the same backend behaviors

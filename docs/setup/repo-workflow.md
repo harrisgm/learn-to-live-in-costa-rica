@@ -15,6 +15,7 @@ Suggested feature branch names:
 - `feat/audio-prototype`
 - `feat/backend-postgres`
 - `feat/native-client-exploration`
+- `feat/native-client-swiftui`
 
 ## Pull Request Expectations
 
@@ -23,6 +24,7 @@ Suggested feature branch names:
 - include screenshots for UI changes
 - call out data-shape changes explicitly
 - call out backend and persistence changes explicitly when they affect shared sessions or local-network behavior
+- call out any API contract changes that affect both the web client and the native Apple client
 
 ## GitHub CLI Auth
 
@@ -38,3 +40,4 @@ Suggested feature branch names:
 - does it keep private data separate from public assets?
 - is the implementation simpler than the next obvious alternative?
 - does it preserve the text-first workflow even if speech is added later?
+- does it keep the native Apple client and the web client aligned on the same backend contract?

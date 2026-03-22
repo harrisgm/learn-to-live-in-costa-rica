@@ -5,6 +5,8 @@
 - Node.js 20+
 - npm 10+
 - a local Postgres instance or reachable LAN Postgres server for durable data
+- Xcode 26+ for the native SwiftUI client when it is being developed
+- XcodeGen for reproducible Apple project generation
 
 ## Suggested Environment
 
@@ -34,6 +36,13 @@ npm run start:network
 npm run typecheck
 ```
 
+```bash
+cd app/apple
+xcodegen generate
+xcodebuild -project CostaRicaSpanishCoach.xcodeproj -scheme CostaRicaSpanishCoach-macOS -destination 'platform=macOS' build
+xcodebuild -project CostaRicaSpanishCoach.xcodeproj -scheme CostaRicaSpanishCoach-iOS -destination 'generic/platform=iOS' build
+```
+
 ## Local-First Expectations
 
 - v1 should work without a public cloud backend
@@ -45,4 +54,5 @@ npm run typecheck
 
 - add export/import workflows for backups and portability
 - add speech experiments only after the text coaching flow feels solid
-- evaluate a native iPhone client once the shared server APIs stabilize
+- add signing and device provisioning for household iPhone/iPad installs
+- refine the SwiftUI native client now that the shared API contract exists

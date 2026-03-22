@@ -1,0 +1,532 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		022C62245A24104CE638E5E9 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 564573F9C6DC6D510EA25F9D /* README.md */; };
+		0612F94A8D006C86DD079ACD /* CoachAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75C224F228D29E5F0869CFFA /* CoachAPIClient.swift */; };
+		2E068F70137E2A9131175029 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 564573F9C6DC6D510EA25F9D /* README.md */; };
+		34563FB5E22A5FB010B8DC95 /* ServerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D29263A9CB998D8A0837383 /* ServerSettingsView.swift */; };
+		4A8EC05FA336516363D499AB /* CoachModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FB5A0F1C0A2D5198BA8A07 /* CoachModels.swift */; };
+		82A7690751FA27178E2F4890 /* CoachModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FB5A0F1C0A2D5198BA8A07 /* CoachModels.swift */; };
+		8C63FE5055C39077E91F8FEA /* CoachViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6060887870EEA5765925F783 /* CoachViewModel.swift */; };
+		8E1ACF32F7FFD8A5B2A771D7 /* CoachRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947C51B60601E6E135BC91D0 /* CoachRootView.swift */; };
+		8E7B77B08CCACC87D849566B /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E908CE437AF0AFD152E43D /* AudioRecorderService.swift */; };
+		945F27FF997CEB14B2E1ADD3 /* SpeechPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9195DE104C124B9E068EA9A /* SpeechPlaybackService.swift */; };
+		965134EEA99C70FCAB20D586 /* CoachRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947C51B60601E6E135BC91D0 /* CoachRootView.swift */; };
+		9871C00869A5B6C26345A1BD /* AudioRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E908CE437AF0AFD152E43D /* AudioRecorderService.swift */; };
+		9CEE4DA2DB1D97E6EED0EF21 /* SpeechPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9195DE104C124B9E068EA9A /* SpeechPlaybackService.swift */; };
+		AAEC8F67FE8D316F7DEC56CD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D11A27A477305BDE793E881F /* Assets.xcassets */; };
+		ADE8AF72FA4EDFD93ECDBA56 /* CoachAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75C224F228D29E5F0869CFFA /* CoachAPIClient.swift */; };
+		B1D08C4913D8689AB0E7E4EC /* CoachVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB896BA2717A419E6542BE53 /* CoachVisuals.swift */; };
+		BF5780A150C226381B9D38BD /* CoachVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB896BA2717A419E6542BE53 /* CoachVisuals.swift */; };
+		C365F6E33F378DFED82D49CB /* CostaRicaSpanishCoach_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 217E6C05E74BB26F2158D0C1 /* CostaRicaSpanishCoach_iOSApp.swift */; };
+		CBAE4BF6AE2BDB26F3DB1CFC /* CoachViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6060887870EEA5765925F783 /* CoachViewModel.swift */; };
+		D9E060762E74C86385014E5A /* CostaRicaSpanishCoach_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DB178DEEC6DA3B1ABE05EA /* CostaRicaSpanishCoach_macOSApp.swift */; };
+		E52A546E8770D973A142AEBB /* ServerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D29263A9CB998D8A0837383 /* ServerSettingsView.swift */; };
+		F1E9A5A56EC4809C04C32F5B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D11A27A477305BDE793E881F /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		217E6C05E74BB26F2158D0C1 /* CostaRicaSpanishCoach_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostaRicaSpanishCoach_iOSApp.swift; sourceTree = "<group>"; };
+		55CA0F59CF4B702EB4FDA5B6 /* CostaRicaSpanishCoach-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CostaRicaSpanishCoach-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		564573F9C6DC6D510EA25F9D /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6060887870EEA5765925F783 /* CoachViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachViewModel.swift; sourceTree = "<group>"; };
+		60DB178DEEC6DA3B1ABE05EA /* CostaRicaSpanishCoach_macOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostaRicaSpanishCoach_macOSApp.swift; sourceTree = "<group>"; };
+		75C224F228D29E5F0869CFFA /* CoachAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachAPIClient.swift; sourceTree = "<group>"; };
+		8CB3C2C934761F042FC46525 /* CostaRicaSpanishCoach-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "CostaRicaSpanishCoach-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		947C51B60601E6E135BC91D0 /* CoachRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachRootView.swift; sourceTree = "<group>"; };
+		9D29263A9CB998D8A0837383 /* ServerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsView.swift; sourceTree = "<group>"; };
+		A3FB5A0F1C0A2D5198BA8A07 /* CoachModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachModels.swift; sourceTree = "<group>"; };
+		A9195DE104C124B9E068EA9A /* SpeechPlaybackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechPlaybackService.swift; sourceTree = "<group>"; };
+		D11A27A477305BDE793E881F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DB896BA2717A419E6542BE53 /* CoachVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachVisuals.swift; sourceTree = "<group>"; };
+		E1E908CE437AF0AFD152E43D /* AudioRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2F70B458DAC6F8460EC23FD8 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A851A9E489BCC93C2A062F31 /* Models */,
+				5DC1F970413B9063DA51F2F2 /* Resources */,
+				763BBA3E8233AE899310A734 /* Services */,
+				FDE5EE1ED39395AB8D9DF8E5 /* ViewModels */,
+				91B0B56F6B51A60D0F13A716 /* Views */,
+			);
+			name = Shared;
+			path = CostaRicaSpanishCoach/Shared;
+			sourceTree = "<group>";
+		};
+		5DC1F970413B9063DA51F2F2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D11A27A477305BDE793E881F /* Assets.xcassets */,
+				564573F9C6DC6D510EA25F9D /* README.md */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		65E5CA3FD71D44B5ED9DF151 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				60DB178DEEC6DA3B1ABE05EA /* CostaRicaSpanishCoach_macOSApp.swift */,
+			);
+			name = macOS;
+			path = CostaRicaSpanishCoach/macOS;
+			sourceTree = "<group>";
+		};
+		6C0C52FE8058B0AEF517A877 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8CB3C2C934761F042FC46525 /* CostaRicaSpanishCoach-iOS.app */,
+				55CA0F59CF4B702EB4FDA5B6 /* CostaRicaSpanishCoach-macOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		763BBA3E8233AE899310A734 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E1E908CE437AF0AFD152E43D /* AudioRecorderService.swift */,
+				75C224F228D29E5F0869CFFA /* CoachAPIClient.swift */,
+				A9195DE104C124B9E068EA9A /* SpeechPlaybackService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		91B0B56F6B51A60D0F13A716 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				947C51B60601E6E135BC91D0 /* CoachRootView.swift */,
+				DB896BA2717A419E6542BE53 /* CoachVisuals.swift */,
+				9D29263A9CB998D8A0837383 /* ServerSettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A05C1FA3359D2022B5F44B42 = {
+			isa = PBXGroup;
+			children = (
+				AEDD3AE81724FCE34AFD24E2 /* iOS */,
+				65E5CA3FD71D44B5ED9DF151 /* macOS */,
+				2F70B458DAC6F8460EC23FD8 /* Shared */,
+				6C0C52FE8058B0AEF517A877 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A851A9E489BCC93C2A062F31 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A3FB5A0F1C0A2D5198BA8A07 /* CoachModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AEDD3AE81724FCE34AFD24E2 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				217E6C05E74BB26F2158D0C1 /* CostaRicaSpanishCoach_iOSApp.swift */,
+			);
+			name = iOS;
+			path = CostaRicaSpanishCoach/iOS;
+			sourceTree = "<group>";
+		};
+		FDE5EE1ED39395AB8D9DF8E5 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				6060887870EEA5765925F783 /* CoachViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		24F549FEEAFBE86FEDD1BDAF /* CostaRicaSpanishCoach-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EBA3A90E58B73E2CC1122FFE /* Build configuration list for PBXNativeTarget "CostaRicaSpanishCoach-macOS" */;
+			buildPhases = (
+				658311335DE097C3EE08D2E6 /* Sources */,
+				4B7E81C87D28B3CA8147EF4E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CostaRicaSpanishCoach-macOS";
+			packageProductDependencies = (
+			);
+			productName = "CostaRicaSpanishCoach-macOS";
+			productReference = 55CA0F59CF4B702EB4FDA5B6 /* CostaRicaSpanishCoach-macOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		40D0DF336608A9C59A579DA2 /* CostaRicaSpanishCoach-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 440CC2ADE676C8FB88980455 /* Build configuration list for PBXNativeTarget "CostaRicaSpanishCoach-iOS" */;
+			buildPhases = (
+				4D19097DA1D9E5644111063C /* Sources */,
+				CE292B9A764B2F69EC448D3F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CostaRicaSpanishCoach-iOS";
+			packageProductDependencies = (
+			);
+			productName = "CostaRicaSpanishCoach-iOS";
+			productReference = 8CB3C2C934761F042FC46525 /* CostaRicaSpanishCoach-iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3BB3E4AFEA6EE7F52CE5BB0A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 67C555A4695DEEE67F00BFC9 /* Build configuration list for PBXProject "CostaRicaSpanishCoach" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = A05C1FA3359D2022B5F44B42;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				40D0DF336608A9C59A579DA2 /* CostaRicaSpanishCoach-iOS */,
+				24F549FEEAFBE86FEDD1BDAF /* CostaRicaSpanishCoach-macOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4B7E81C87D28B3CA8147EF4E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1E9A5A56EC4809C04C32F5B /* Assets.xcassets in Resources */,
+				022C62245A24104CE638E5E9 /* README.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE292B9A764B2F69EC448D3F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAEC8F67FE8D316F7DEC56CD /* Assets.xcassets in Resources */,
+				2E068F70137E2A9131175029 /* README.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4D19097DA1D9E5644111063C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9871C00869A5B6C26345A1BD /* AudioRecorderService.swift in Sources */,
+				0612F94A8D006C86DD079ACD /* CoachAPIClient.swift in Sources */,
+				4A8EC05FA336516363D499AB /* CoachModels.swift in Sources */,
+				8E1ACF32F7FFD8A5B2A771D7 /* CoachRootView.swift in Sources */,
+				CBAE4BF6AE2BDB26F3DB1CFC /* CoachViewModel.swift in Sources */,
+				BF5780A150C226381B9D38BD /* CoachVisuals.swift in Sources */,
+				C365F6E33F378DFED82D49CB /* CostaRicaSpanishCoach_iOSApp.swift in Sources */,
+				34563FB5E22A5FB010B8DC95 /* ServerSettingsView.swift in Sources */,
+				945F27FF997CEB14B2E1ADD3 /* SpeechPlaybackService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		658311335DE097C3EE08D2E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8E7B77B08CCACC87D849566B /* AudioRecorderService.swift in Sources */,
+				ADE8AF72FA4EDFD93ECDBA56 /* CoachAPIClient.swift in Sources */,
+				82A7690751FA27178E2F4890 /* CoachModels.swift in Sources */,
+				965134EEA99C70FCAB20D586 /* CoachRootView.swift in Sources */,
+				8C63FE5055C39077E91F8FEA /* CoachViewModel.swift in Sources */,
+				B1D08C4913D8689AB0E7E4EC /* CoachVisuals.swift in Sources */,
+				D9E060762E74C86385014E5A /* CostaRicaSpanishCoach_macOSApp.swift in Sources */,
+				E52A546E8770D973A142AEBB /* ServerSettingsView.swift in Sources */,
+				9CEE4DA2DB1D97E6EED0EF21 /* SpeechPlaybackService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1269D11A8EB83B118DF95258 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record short Spanish practice audio to send to your shared coach server for transcription.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.harrisgm.costaricaspanishcoach.macos;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		3D21B8887779124B6F741BBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Costa Rica Coach";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Connect to your shared coach server on your home network so the app can load scenarios, save sessions, and run AI feedback.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record short Spanish practice audio to send to your shared coach server for transcription.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = (
+					UIInterfaceOrientationPortrait,
+					UIInterfaceOrientationPortraitUpsideDown,
+					UIInterfaceOrientationLandscapeLeft,
+					UIInterfaceOrientationLandscapeRight,
+				);
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = (
+					UIInterfaceOrientationPortrait,
+					UIInterfaceOrientationLandscapeLeft,
+					UIInterfaceOrientationLandscapeRight,
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.harrisgm.costaricaspanishcoach.ios;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		53DF03BA2536D36F847E41A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "Costa Rica Spanish Coach";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		A74B7B04A41D83A96B53C32F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record short Spanish practice audio to send to your shared coach server for transcription.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.harrisgm.costaricaspanishcoach.macos;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B07C0B577B00EE44297C3B7E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "Costa Rica Spanish Coach";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		EA016926C40B677F1BC4D608 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Costa Rica Coach";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Connect to your shared coach server on your home network so the app can load scenarios, save sessions, and run AI feedback.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record short Spanish practice audio to send to your shared coach server for transcription.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = (
+					UIInterfaceOrientationPortrait,
+					UIInterfaceOrientationPortraitUpsideDown,
+					UIInterfaceOrientationLandscapeLeft,
+					UIInterfaceOrientationLandscapeRight,
+				);
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = (
+					UIInterfaceOrientationPortrait,
+					UIInterfaceOrientationLandscapeLeft,
+					UIInterfaceOrientationLandscapeRight,
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.harrisgm.costaricaspanishcoach.ios;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		440CC2ADE676C8FB88980455 /* Build configuration list for PBXNativeTarget "CostaRicaSpanishCoach-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3D21B8887779124B6F741BBB /* Debug */,
+				EA016926C40B677F1BC4D608 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		67C555A4695DEEE67F00BFC9 /* Build configuration list for PBXProject "CostaRicaSpanishCoach" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B07C0B577B00EE44297C3B7E /* Debug */,
+				53DF03BA2536D36F847E41A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EBA3A90E58B73E2CC1122FFE /* Build configuration list for PBXNativeTarget "CostaRicaSpanishCoach-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1269D11A8EB83B118DF95258 /* Debug */,
+				A74B7B04A41D83A96B53C32F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3BB3E4AFEA6EE7F52CE5BB0A /* Project object */;
+}
