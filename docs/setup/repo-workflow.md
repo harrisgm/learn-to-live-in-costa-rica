@@ -24,6 +24,12 @@ Suggested feature branch names:
 - call out data-shape changes explicitly
 - call out backend and persistence changes explicitly when they affect shared sessions or local-network behavior
 
+## GitHub CLI Auth
+
+- run `gh auth` commands with elevated permissions outside the sandbox
+- if `gh auth status` fails in the sandbox, retry outside the sandbox before assuming login is broken
+- prefer fixing auth visibility first, then continue with repo creation, pushes, PRs, or other GitHub CLI flows
+
 ## Review Checklist
 
 - does the change improve conversation ability?

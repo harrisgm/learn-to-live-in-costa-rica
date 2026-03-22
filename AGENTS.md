@@ -32,6 +32,11 @@ Build a practical Spanish-learning system and local-first coaching app for an Am
 - Keep prompts modular under `/prompts`
 - Keep data files structured and machine-readable when possible
 - Separate generic curriculum assets from user-private learning data
+- Run `gh auth` commands with elevated permissions outside the sandbox, because the GitHub keychain-backed login may appear invalid inside the sandbox even when host auth is healthy
+
+## GitHub CLI Notes
+- Treat `gh auth status`, `gh auth login`, `gh auth logout`, and similar auth-check commands as outside-sandbox operations
+- If a sandboxed `gh auth` check looks broken, retry with elevated permissions before attempting any re-auth flow
 
 ## When Adding Features
 Always ask:
