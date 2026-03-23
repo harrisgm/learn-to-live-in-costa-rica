@@ -23,6 +23,13 @@ Use this checklist when closing a steward thread or preparing a clean handoff in
 - [ ] Important merges or pushes since the last handoff summarized
 - [ ] Active milestone named
 
+## Delegation
+
+- [ ] Early delegation review completed
+- [ ] Subagents started for parallelizable work, or reason none were needed recorded
+- [ ] Delegated outputs reconciled before closeout
+- [ ] Any still-useful parallel work for the next steward identified
+
 ## Verification
 
 - [ ] Builds, tests, or smoke checks run this session listed

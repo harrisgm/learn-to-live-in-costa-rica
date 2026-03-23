@@ -19,6 +19,9 @@ Also use the ChatGPT/Codex handoff layer:
 - `/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/CONTENT_STATUS.md`
 
 Maximize subagent use where it reduces steward-thread context overhead, but keep each delegated task narrowly scoped, non-overlapping, and materially useful.
+Do an early delegation review before settling into single-threaded work.
+If two or more bounded non-blocking tasks exist, spin up subagents near the start of the milestone.
+If no subagents are started, explain briefly why the work is not meaningfully parallelizable.
 
 ==================================================
 HANDOFF SUMMARY
@@ -382,6 +385,7 @@ IMPLEMENTATION NOTES
 - Favor clean seams for later Listening Lab and Couple Mode milestones.
 - Start with a short milestone plan for this thread only, then execute the work.
 - Use subagents aggressively for bounded discovery, verification, and parallel reading where helpful.
+- Within the first working pass, explicitly identify the critical-path work that stays local and the sidecar tasks that should be delegated.
 
 ==================================================
 OUTPUT FORMAT

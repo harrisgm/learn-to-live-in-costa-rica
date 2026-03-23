@@ -69,6 +69,9 @@ The steward thread does not need to update every project doc every session. Upda
 
 Use subagents aggressively when they reduce steward-thread overhead, but keep each delegated task narrow and concrete.
 
+A steward thread should default to early delegation, not late delegation.
+If two or more bounded non-blocking tasks exist, the steward thread should spin up subagents near the start of the work instead of keeping discovery and verification entirely in the main thread.
+
 Good delegation targets:
 
 - repo/file discovery
@@ -84,6 +87,13 @@ Delegation rules:
 - do not let subagents make broad changes without a clear file boundary
 - reconcile subagent results in the steward thread before deciding
 - prefer local execution for urgent critical-path work
+
+Default delegation workflow:
+
+1. Identify the immediate critical-path task that must stay in the steward thread.
+2. Identify discovery, verification, or implementation slices that can proceed in parallel without blocking that immediate next step.
+3. Start subagents early for those sidecar tasks.
+4. If no meaningful delegation exists, say so explicitly in an early update instead of silently staying single-threaded.
 
 ## When To Stay In The Current Steward Thread
 

@@ -42,6 +42,9 @@ Build a practical Spanish-learning system and local-first coaching app for an Am
 - Use [`docs/stewardship/STEWARD_THREAD_HANDBOOK.md`](docs/stewardship/STEWARD_THREAD_HANDBOOK.md) for steward-thread ownership, handoff timing, and delegation expectations
 - Use [`docs/stewardship/HANDOFF_CHECKLIST.md`](docs/stewardship/HANDOFF_CHECKLIST.md) when closing a steward thread or handing off to a new one
 - Use [`docs/chatgpt/README.md`](docs/chatgpt/README.md) as the source index for ChatGPT project uploads and thread setup
+- For any non-trivial task, do an early delegation review before settling into single-threaded work
+- If two or more bounded non-blocking tasks exist, spin up subagents early for discovery, verification, or disjoint implementation slices
+- If no subagents are used, briefly state why the work is not meaningfully parallelizable
 
 ## When Adding Features
 Always ask:

@@ -24,6 +24,12 @@ Keep it short enough to read in one screen.
 - Latest commit: `short-sha and message`
 - Workspace state: `clean` or `dirty`
 
+## Subagent Status
+
+- Subagents used: `list agent roles or say none`
+- If none: `brief reason the work was not meaningfully parallelizable`
+- Remaining parallelizable work for next steward: `optional`
+
 ## What Changed
 
 - `high-signal change 1`
