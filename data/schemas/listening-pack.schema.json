@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://learn-to-live-in-costa-rica.local/schemas/listening-pack.schema.json",
+  "title": "Listening Pack",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "scenarioId",
+    "difficulty",
+    "focus",
+    "challenge",
+    "previewLine",
+    "transcript",
+    "comprehensionChecks",
+    "dictationLine",
+    "shadowingLines",
+    "cueNotes"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "scenarioId": { "type": "string" },
+    "difficulty": {
+      "type": "string",
+      "enum": ["beginner", "beginner+", "intermediate", "natural", "costa-rica-fast"]
+    },
+    "focus": { "type": "string" },
+    "challenge": { "type": "string" },
+    "previewLine": { "type": "string" },
+    "transcript": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["speaker", "text", "speed"],
+        "properties": {
+          "speaker": { "type": "string" },
+          "text": { "type": "string" },
+          "speed": {
+            "type": "string",
+            "enum": ["slow", "natural", "fast"]
+          },
+          "note": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "comprehensionChecks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "dictationLine": { "type": "string" },
+    "shadowingLines": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "cueNotes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

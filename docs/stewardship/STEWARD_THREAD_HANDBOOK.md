@@ -137,6 +137,9 @@ The repo handoff layer should stay aligned with the ChatGPT project threads:
 - [MASTER_PLAN_REQUEST.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/MASTER_PLAN_REQUEST.md) for strategy and long-range sequencing
 - [PROGRESS_TRACKER_OPERATING_RULES.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/PROGRESS_TRACKER_OPERATING_RULES.md) for weekly operating rhythm
 - [CURRENT_STATE_CODEX_HANDOFF.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/CURRENT_STATE_CODEX_HANDOFF.md) for current repo truth
+- [LANE_MAP.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/LANE_MAP.md) for recommended ChatGPT lane structure and ownership boundaries
+- [HANDOFF_PROTOCOL.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/HANDOFF_PROTOCOL.md) and [THREAD_TEMPLATE.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/THREAD_TEMPLATE.md) for thread rollover and packet format
+- [STEWARD_OPERATING_RHYTHM.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/STEWARD_OPERATING_RHYTHM.md) and [LANE_BOOTSTRAP_PROMPTS.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/LANE_BOOTSTRAP_PROMPTS.md) for control-tower cadence and new lane starts
 
 Use [docs/chatgpt/README.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/README.md) as the source index for what to upload into the ChatGPT project.
 

@@ -31,6 +31,8 @@ Build a practical Spanish-learning system and local-first coaching app for an Am
 - JSON schemas exist for user profiles, scenarios, vocabulary, lesson units, error logs, and session history.
 - Public starter learner files exist, along with placeholder private/local-only guidance.
 - Vocabulary, lesson, and scenario starter packs are already in place.
+- The core daily-life scenarios now include structured turns, branches, couple handoff hints, and listening cue links.
+- Starter listening packs now exist for the highest-value scenario families.
 - Prompt packs exist for correction, naturalization, couple mode, tutor mode, and Costa Rica roleplay/system contexts.
 - Worksheet, dictation, quiz, and speaking-drill starter content exists.
 
@@ -47,6 +49,10 @@ Build a practical Spanish-learning system and local-first coaching app for an Am
 - `docker-compose.yml` exists for local Postgres.
 - The app can use OpenAI-backed correction/transcription when configured, with local/fallback behavior when not configured.
 - The web app has already been built and verified in Codex.
+- The core learner loop now returns a structured coaching contract instead of only thin freeform fields.
+- Saved sessions now persist scenario context, typed error tags, retry prompts, follow-up prompts, and review recommendations.
+- The sessions API now exposes a learner-review summary with recent mistakes, recurring tags, richer drill suggestions, and listening recommendations.
+- Speech input remains thin, but now runs through the same coaching contract as typed text.
 
 ### Native Apple Client
 
@@ -61,6 +67,7 @@ Build a practical Spanish-learning system and local-first coaching app for an Am
   - microphone recording
   - local speech playback
 - The native client has already been verified through successful iOS and macOS builds in Codex.
+- The native client now mirrors the upgraded backend contract, including retry-first structured feedback, richer drill data, and learner review summary data.
 
 ### Apple Polish And Install Work
 
@@ -93,6 +100,7 @@ Build a practical Spanish-learning system and local-first coaching app for an Am
 - The Apple clients are front ends over the shared backend, not separate local business-logic forks.
 - Text-first correction/roleplay/listening remains the v1 center of gravity.
 - Speech matters, but should not dominate priorities before the correction and scenario loop is solid.
+- The current content push is centered on structured scenario branching, richer review drills, and listening starter packs that reuse the same session contract.
 
 ## Commit Landmarks
 
@@ -112,7 +120,7 @@ Build a practical Spanish-learning system and local-first coaching app for an Am
 
 ## What Still Needs Strategic Attention
 
-- Better sequencing between app work and learning-content work
-- Clear next milestones for scenario engine, couple mode, and listening lab
+- Better sequencing between scenario depth, review/drill generation, and learning-content expansion
+- Clear next milestones for scenario engine, couple mode, and listening lab on top of the new session contract
 - A stronger curriculum/content operating rhythm beyond weeks 1-4
 - Better definition of what should wait so the project does not overbuild speech or distribution too early

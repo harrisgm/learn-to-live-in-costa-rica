@@ -161,11 +161,23 @@ struct CoachRootView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Text(viewModel.scenarios.first(where: { $0.id == session.scenarioId })?.title ?? session.scenarioId)
+            Text(session.scenarioSnapshot.title)
                 .font(.headline)
                 .foregroundStyle(CoachVisuals.coffee)
 
-            Text(session.userInput)
+            if let variant = session.scenarioSnapshot.variantLabel {
+                Text(variant)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let turn = session.scenarioSnapshot.turnLabel {
+                Text(turn)
+                    .font(.caption)
+                    .foregroundStyle(CoachVisuals.palm)
+            }
+
+            Text(session.feedback.transcriptText)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
@@ -199,9 +211,16 @@ struct CoachRootView: View {
                     readinessCard
                     selectionGrid
                     composerCard
+                    if viewModel.currentListeningPack != nil {
+                        listeningLabCard
+                    }
 
                     if let session = viewModel.activeSession {
                         feedbackCard(session: session)
+                    }
+
+                    if let summary = viewModel.reviewSummary {
+                        reviewCard(summary: summary)
                     }
                 }
             }
@@ -401,6 +420,38 @@ struct CoachRootView: View {
                         .foregroundStyle(CoachVisuals.coffee.opacity(0.78))
 
                     FlexibleChipsView(items: scenario.mustKnowVocabulary, tint: CoachVisuals.sunrise)
+
+                    if let variant = viewModel.currentScenarioVariant {
+                        HStack(alignment: .top, spacing: 10) {
+                            ChipView(title: variant.title, tint: CoachVisuals.palm)
+                            Text(variant.setup)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if let turn = viewModel.currentScenarioTurn {
+                        HStack(alignment: .top, spacing: 10) {
+                            ChipView(title: turn.title, tint: CoachVisuals.ocean)
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(turn.learnerGoal)
+                                    .font(.footnote.weight(.semibold))
+                                    .foregroundStyle(CoachVisuals.coffee)
+                                Text(turn.repairCue)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+
+                    if let pack = viewModel.currentListeningPack {
+                        HStack(alignment: .top, spacing: 10) {
+                            ChipView(title: pack.title, tint: CoachVisuals.terracotta)
+                            Text(pack.previewLine)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -445,6 +496,48 @@ struct CoachRootView: View {
                 )
 
                 selectionCard(
+                    title: "Variant",
+                    subtitle: viewModel.currentScenarioVariant?.setup ?? "Choose the scenario version and pressure level.",
+                    accessory: AnyView(
+                        Group {
+                            if let scenario = viewModel.currentScenario, !scenario.variants.isEmpty {
+                                Picker("Variant", selection: $viewModel.selectedScenarioVariantID) {
+                                    ForEach(scenario.variants) { variant in
+                                        Text(variant.title).tag(variant.id)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                            } else {
+                                Text("Variants load with the selected scenario.")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    )
+                )
+
+                selectionCard(
+                    title: "Turn",
+                    subtitle: viewModel.currentScenarioTurn?.learnerGoal ?? "Choose the next roleplay beat.",
+                    accessory: AnyView(
+                        Group {
+                            if let scenario = viewModel.currentScenario, !scenario.turns.isEmpty {
+                                Picker("Turn", selection: $viewModel.selectedScenarioTurnID) {
+                                    ForEach(scenario.turns) { turn in
+                                        Text(turn.title).tag(turn.id)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                            } else {
+                                Text("Turns load with the selected scenario.")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    )
+                )
+
+                selectionCard(
                     title: "Mode",
                     subtitle: "Switch the tone of the coaching flow.",
                     accessory: AnyView(
@@ -469,9 +562,40 @@ struct CoachRootView: View {
                         .pickerStyle(.menu)
                     )
                 )
+
+                selectionCard(
+                    title: "Listening Pack",
+                    subtitle: viewModel.currentListeningPack?.focus ?? "Pick a practice ear-training pack.",
+                    accessory: AnyView(
+                        Group {
+                            if viewModel.currentScenarioListeningPacks.isEmpty == false {
+                                Picker("Listening Pack", selection: $viewModel.selectedListeningPackID) {
+                                    ForEach(viewModel.currentScenarioListeningPacks) { pack in
+                                        Text(pack.title).tag(pack.id)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                            } else if viewModel.listeningPacks.isEmpty == false {
+                                Picker("Listening Pack", selection: $viewModel.selectedListeningPackID) {
+                                    ForEach(viewModel.listeningPacks) { pack in
+                                        Text(pack.title).tag(pack.id)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                            } else {
+                                Text("No listening packs loaded yet.")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    )
+                )
             }
         }
         .coachCard()
+        .onChange(of: viewModel.selectedScenarioID) { _, _ in
+            viewModel.syncScenarioContext()
+        }
     }
 
     private func selectionCard(title: String, subtitle: String, accessory: AnyView) -> some View {
@@ -540,7 +664,7 @@ struct CoachRootView: View {
                     .scrollContentBackground(.hidden)
                     .background(Color.clear)
                     .onChange(of: viewModel.input) { _, _ in
-                        viewModel.beginTyping()
+                        viewModel.handleComposerChange()
                     }
             }
             .overlay(
@@ -593,49 +717,581 @@ struct CoachRootView: View {
         .coachCard()
     }
 
+    private var listeningLabCard: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            if let pack = viewModel.currentListeningPack {
+                SectionIntroView(
+                    eyebrow: "Listening Lab",
+                    title: pack.title,
+                    bodyText: "\(pack.focus) - \(pack.challenge)",
+                    tint: CoachVisuals.terracotta
+                )
+
+                HStack(alignment: .top, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Preview line")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(CoachVisuals.ocean)
+                        Text(pack.previewLine)
+                            .font(.body)
+                            .foregroundStyle(CoachVisuals.coffee.opacity(0.84))
+
+                        HStack(spacing: 12) {
+                            Button {
+                                viewModel.speak(pack.previewLine)
+                            } label: {
+                                Label("Hear Preview", systemImage: "speaker.wave.2.fill")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(CoachSecondaryButtonStyle(tint: CoachVisuals.ocean))
+
+                            Button {
+                                viewModel.useListeningPreview(pack)
+                            } label: {
+                                Label("Load Dictation", systemImage: "text.badge.plus")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(CoachPrimaryButtonStyle(tint: CoachVisuals.palm))
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Cues")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(CoachVisuals.terracotta)
+
+                        ForEach(pack.cueNotes.prefix(3), id: \.self) { note in
+                            Text("- \(note)")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if let firstCheck = pack.comprehensionChecks.first {
+                            Text("Check: \(firstCheck)")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(CoachVisuals.coffee)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Transcript snippets")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(CoachVisuals.palm)
+
+                    ForEach(pack.transcript.prefix(3), id: \.self) { line in
+                        HStack(alignment: .top, spacing: 10) {
+                            ChipView(title: line.speed.capitalized, tint: CoachVisuals.sunrise)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(line.speaker)
+                                    .font(.footnote.weight(.semibold))
+                                    .foregroundStyle(CoachVisuals.coffee)
+                                Text(line.text)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                                if let note = line.note {
+                                    Text(note)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .coachCard()
+    }
+
     private func feedbackCard(session: PracticeSession) -> some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack {
                 SectionIntroView(
                     eyebrow: "Current Feedback",
-                    title: viewModel.scenarios.first(where: { $0.id == session.scenarioId })?.title ?? "Practice Review",
+                    title: session.scenarioSnapshot.title,
                     bodyText: session.createdAtDate?.formatted(date: .abbreviated, time: .shortened) ?? session.createdAt,
                     tint: CoachVisuals.ocean
                 )
                 Spacer()
-                ChipView(title: session.feedback.provider, tint: CoachVisuals.ocean)
+                VStack(alignment: .trailing, spacing: 10) {
+                    ChipView(title: session.feedback.provider, tint: CoachVisuals.ocean)
+                    ChipView(title: session.feedback.feedbackMode.rawValue.capitalized, tint: CoachVisuals.palm)
+                }
             }
 
-            feedbackRow(title: "Original", body: session.userInput, tint: CoachVisuals.coffee)
-            feedbackRow(title: "Corrected Spanish", body: session.feedback.correctedSpanish, tint: CoachVisuals.terracotta, speakable: true)
-            feedbackRow(title: "More Natural", body: session.feedback.naturalSpanish, tint: CoachVisuals.ocean, speakable: true)
-            feedbackRow(title: "Explanation", body: session.feedback.explanation, tint: CoachVisuals.palm)
-            feedbackRow(title: "Follow-up Reply", body: session.feedback.followUpReply, tint: CoachVisuals.sunrise, speakable: true)
+            HStack {
+                ChipView(title: session.feedback.inputMode.title, tint: CoachVisuals.sunrise)
+                ChipView(title: session.feedback.learnerFocus.rawValue.capitalized, tint: CoachVisuals.terracotta)
+                Spacer()
+                Text("Confidence \(Int(session.feedback.confidenceScore * 100))%")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(CoachVisuals.coffee)
+            }
+
+            feedbackRow(
+                title: session.source == .speech ? "Transcript" : "Original",
+                body: session.feedback.transcriptText,
+                tint: CoachVisuals.coffee
+            )
+            feedbackRow(title: "Corrected Spanish", body: session.feedback.correctedText, tint: CoachVisuals.terracotta, speakable: true)
+            feedbackRow(title: "More Natural", body: session.feedback.naturalText, tint: CoachVisuals.ocean, speakable: true)
+            feedbackRow(title: "Explanation", body: session.feedback.explanationSummary, tint: CoachVisuals.palm)
+
+            VStack(alignment: .leading, spacing: 14) {
+                Text("RETRY PROMPT")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(CoachVisuals.terracotta)
+
+                Text(session.feedback.retryPrompt)
+                    .font(.body)
+                    .foregroundStyle(CoachVisuals.coffee.opacity(0.84))
+
+                HStack(spacing: 12) {
+                    Button {
+                        viewModel.useCorrectedText(from: session)
+                    } label: {
+                        Label("Use Corrected", systemImage: "text.badge.checkmark")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(CoachPrimaryButtonStyle(tint: CoachVisuals.palm))
+
+                    Button {
+                        viewModel.useNaturalText(from: session)
+                    } label: {
+                        Label("Use Natural", systemImage: "text.badge.star")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(CoachSecondaryButtonStyle(tint: CoachVisuals.ocean))
+                }
+            }
+            .padding(18)
+            .background(
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(Color.white.opacity(0.66))
+            )
+
+            VStack(alignment: .leading, spacing: 14) {
+                Text("FOLLOW-UP PROMPT")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(CoachVisuals.sunrise)
+
+                Text(session.feedback.followUpPrompt)
+                    .font(.body)
+                    .foregroundStyle(CoachVisuals.coffee.opacity(0.84))
+
+                HStack(spacing: 12) {
+                    Button {
+                        viewModel.speak(session.feedback.followUpPrompt)
+                    } label: {
+                        Label("Speak Prompt", systemImage: "speaker.wave.2.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(CoachSecondaryButtonStyle(tint: CoachVisuals.ocean))
+                }
+            }
+            .padding(18)
+            .background(
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(Color.white.opacity(0.66))
+            )
+
+            if let coupleHandoff = session.feedback.coupleHandoff {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("COUPLE HANDOFF")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(CoachVisuals.palm)
+
+                    HStack(alignment: .top, spacing: 12) {
+                        ChipView(title: coupleHandoff.leadRole, tint: CoachVisuals.terracotta)
+                        ChipView(title: coupleHandoff.supportRole, tint: CoachVisuals.ocean)
+                    }
+
+                    Text(coupleHandoff.handoffPrompt)
+                        .font(.subheadline)
+                        .foregroundStyle(CoachVisuals.coffee.opacity(0.84))
+                    Text(coupleHandoff.coachingTip)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(18)
+                .background(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .fill(Color.white.opacity(0.66))
+                )
+            }
+
+            if let recommendation = session.feedback.listeningRecommendation {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("LISTENING RECOMMENDATION")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(CoachVisuals.terracotta)
+
+                    Text(recommendation.packTitle)
+                        .font(.headline)
+                        .foregroundStyle(CoachVisuals.coffee)
+                    Text(recommendation.reason)
+                        .font(.subheadline)
+                        .foregroundStyle(CoachVisuals.coffee.opacity(0.82))
+                    Text(recommendation.previewLine)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    if let pack = viewModel.listeningPacks.first(where: { $0.id == recommendation.packId }) {
+                        Button {
+                            viewModel.useListeningPreview(pack)
+                        } label: {
+                            Label("Load Listening Preview", systemImage: "text.viewfinder")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(CoachPrimaryButtonStyle(tint: CoachVisuals.palm))
+                    }
+                }
+                .padding(18)
+                .background(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .fill(Color.white.opacity(0.66))
+                )
+            }
+
+            if !session.feedback.recommendedDrills.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("RECOMMENDED DRILLS")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(CoachVisuals.terracotta)
+
+                    ForEach(Array(session.feedback.recommendedDrills.prefix(2)), id: \.self) { drill in
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                ChipView(title: drill.kind.title, tint: CoachVisuals.ocean)
+                                Spacer()
+                            }
+
+                            Text(drill.title)
+                                .font(.headline)
+                                .foregroundStyle(CoachVisuals.coffee)
+                            Text(drill.reason)
+                                .font(.subheadline)
+                                .foregroundStyle(CoachVisuals.coffee.opacity(0.82))
+                            Text("Model: \(drill.prompt)")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+
+                            if !drill.steps.isEmpty {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    ForEach(drill.steps, id: \.self) { step in
+                                        Text("\(step.label): \(step.prompt)")
+                                            .font(.footnote)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+
+                            Button {
+                                viewModel.useRecommendedDrill(drill)
+                            } label: {
+                                Label("Load Drill", systemImage: "list.bullet.clipboard")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(CoachSecondaryButtonStyle(tint: CoachVisuals.ocean))
+                        }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .fill(Color.white.opacity(0.58))
+                        )
+                    }
+                }
+            }
 
             VStack(alignment: .leading, spacing: 10) {
                 Text("Vocabulary")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(CoachVisuals.palm)
-                FlexibleChipsView(items: session.feedback.vocabularyNotes, tint: CoachVisuals.palm)
+                ForEach(session.feedback.vocabNotes, id: \.term) { note in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\(note.term) (\(note.gloss))")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(CoachVisuals.coffee)
+                        Text(note.note)
+                            .font(.subheadline)
+                            .foregroundStyle(CoachVisuals.coffee.opacity(0.8))
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .fill(Color.white.opacity(0.58))
+                    )
+                }
             }
 
             VStack(alignment: .leading, spacing: 10) {
                 Text("Pronunciation Notes")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(CoachVisuals.ocean)
-                ForEach(session.feedback.pronunciationNotes, id: \.self) { note in
-                    Text(note)
-                        .font(.subheadline)
-                        .foregroundStyle(CoachVisuals.coffee.opacity(0.8))
+                ForEach(session.feedback.pronunciationHints, id: \.self) { hint in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(hint.term)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(CoachVisuals.coffee)
+                        Text(hint.hint)
+                            .font(.subheadline)
+                            .foregroundStyle(CoachVisuals.coffee.opacity(0.8))
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .fill(Color.white.opacity(0.58))
+                    )
                 }
             }
 
-            HStack {
-                FlexibleChipsView(items: session.feedback.errorTags, tint: CoachVisuals.terracotta)
-                Spacer()
-                Text("Confidence \(Int(session.feedback.confidenceScore * 100))%")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(CoachVisuals.coffee)
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Error Focus")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(CoachVisuals.terracotta)
+                ForEach(session.feedback.errorTags, id: \.self) { tag in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            ChipView(
+                                title: formatTagCode(tag.code),
+                                tint: tag.severity == .primary ? CoachVisuals.terracotta : CoachVisuals.ocean
+                            )
+                            ChipView(title: tag.severity.rawValue.capitalized, tint: CoachVisuals.sunrise)
+                            Spacer()
+                        }
+
+                        Text(tag.message)
+                            .font(.subheadline)
+                            .foregroundStyle(CoachVisuals.coffee.opacity(0.8))
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .fill(Color.white.opacity(0.58))
+                    )
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Review Recommendation")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(CoachVisuals.palm)
+                Text(session.feedback.reviewRecommendation.reason)
+                    .font(.subheadline)
+                    .foregroundStyle(CoachVisuals.coffee.opacity(0.84))
+                Text("Next step: \(session.feedback.reviewRecommendation.nextStep)")
+                    .font(.subheadline)
+                    .foregroundStyle(CoachVisuals.coffee.opacity(0.72))
+            }
+        }
+        .coachCard()
+    }
+
+    private func reviewCard(summary: LearnerReviewSummary) -> some View {
+        VStack(alignment: .leading, spacing: 18) {
+            SectionIntroView(
+                eyebrow: "Review Summary",
+                title: "Persisted mistake memory for this learner",
+                bodyText: "These recurring tags and drill suggestions come from saved backend sessions, so they travel across devices.",
+                tint: CoachVisuals.terracotta
+            )
+
+            HStack(spacing: 14) {
+                MetricTileView(
+                    title: "Sessions",
+                    value: "\(summary.totalSessions)",
+                    subtitle: "Stored turns",
+                    tint: CoachVisuals.terracotta
+                )
+                MetricTileView(
+                    title: "Confidence",
+                    value: "\(Int(summary.averageConfidence * 100))%",
+                    subtitle: "Average",
+                    tint: CoachVisuals.ocean
+                )
+            }
+
+            if !summary.recurringTags.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Recurring Tags")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(CoachVisuals.palm)
+
+                    ForEach(summary.recurringTags.prefix(3), id: \.self) { tag in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                ChipView(title: formatTagCode(tag.code), tint: CoachVisuals.terracotta)
+                                ChipView(title: "\(tag.count)x", tint: CoachVisuals.ocean)
+                                Spacer()
+                            }
+
+                            Text(tag.lastMessage)
+                                .font(.subheadline)
+                                .foregroundStyle(CoachVisuals.coffee.opacity(0.82))
+
+                            Text("Last seen in \(tag.lastScenarioTitle)")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .fill(Color.white.opacity(0.58))
+                        )
+                    }
+                }
+            }
+
+            if !summary.recentMistakes.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Recent Mistakes")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(CoachVisuals.ocean)
+
+                    ForEach(summary.recentMistakes.prefix(3), id: \.self) { mistake in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                ChipView(title: formatTagCode(mistake.primaryTag.code), tint: CoachVisuals.terracotta)
+                                ChipView(title: mistake.inputMode.title, tint: CoachVisuals.sunrise)
+                                Spacer()
+                            }
+
+                            Text(mistake.transcriptText)
+                                .font(.subheadline)
+                                .foregroundStyle(CoachVisuals.coffee.opacity(0.82))
+
+                            Text("Retry: \(mistake.retryPrompt)")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            Text("Correction: \(mistake.correctedText)")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .fill(Color.white.opacity(0.58))
+                        )
+                    }
+                }
+            }
+
+            if !summary.recommendedDrills.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Recommended Drills")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(CoachVisuals.sunrise)
+
+                    ForEach(Array(summary.recommendedDrills.prefix(3)), id: \.self) { drill in
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                ChipView(title: drill.kind.title, tint: CoachVisuals.ocean)
+                                Spacer()
+                            }
+
+                            Text(drill.title)
+                                .font(.headline)
+                                .foregroundStyle(CoachVisuals.coffee)
+                            Text(drill.reason)
+                                .font(.subheadline)
+                                .foregroundStyle(CoachVisuals.coffee.opacity(0.82))
+                            Text("Model sentence: \(drill.prompt)")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+
+                            if !drill.steps.isEmpty {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    ForEach(drill.steps, id: \.self) { step in
+                                        Text("\(step.label): \(step.prompt)")
+                                            .font(.footnote)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+
+                            Button {
+                                viewModel.useRecommendedDrill(drill)
+                            } label: {
+                                Label("Load Drill", systemImage: "list.bullet.clipboard")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(CoachPrimaryButtonStyle(tint: CoachVisuals.palm))
+                        }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .fill(Color.white.opacity(0.58))
+                        )
+                    }
+                }
+            } else if let drill = summary.nextRecommendedDrill {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Next Drill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(CoachVisuals.sunrise)
+
+                    Text(drill.title)
+                        .font(.headline)
+                        .foregroundStyle(CoachVisuals.coffee)
+                    Text(drill.reason)
+                        .font(.subheadline)
+                        .foregroundStyle(CoachVisuals.coffee.opacity(0.82))
+                    Text("Suggested model sentence: \(drill.prompt)")
+                        .font(.subheadline)
+                        .foregroundStyle(CoachVisuals.coffee.opacity(0.74))
+
+                    Button {
+                        viewModel.useRecommendedDrill(drill)
+                    } label: {
+                        Label("Load Model", systemImage: "list.bullet.clipboard")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(CoachPrimaryButtonStyle(tint: CoachVisuals.palm))
+                }
+                .padding(18)
+                .background(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .fill(Color.white.opacity(0.66))
+                )
+            }
+
+            if !summary.listeningRecommendations.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Listening Recommendations")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(CoachVisuals.terracotta)
+
+                    ForEach(Array(summary.listeningRecommendations.prefix(2)), id: \.self) { recommendation in
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(recommendation.packTitle)
+                                .font(.headline)
+                                .foregroundStyle(CoachVisuals.coffee)
+                            Text(recommendation.reason)
+                                .font(.subheadline)
+                                .foregroundStyle(CoachVisuals.coffee.opacity(0.82))
+                            Text(recommendation.previewLine)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+
+                            if let pack = viewModel.listeningPacks.first(where: { $0.id == recommendation.packId }) {
+                                Button {
+                                    viewModel.useListeningPreview(pack)
+                                } label: {
+                                    Label("Load Listening Preview", systemImage: "text.viewfinder")
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(CoachSecondaryButtonStyle(tint: CoachVisuals.ocean))
+                            }
+                        }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .fill(Color.white.opacity(0.58))
+                        )
+                    }
+                }
             }
         }
         .coachCard()
@@ -671,6 +1327,14 @@ struct CoachRootView: View {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(Color.white.opacity(0.66))
         )
+    }
+
+    private func formatTagCode(_ code: String) -> String {
+        code
+            .lowercased()
+            .split(separator: "_")
+            .map { $0.capitalized }
+            .joined(separator: " ")
     }
 }
 

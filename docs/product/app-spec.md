@@ -14,26 +14,31 @@ Deliver a local-network coaching system that helps two learners practice Spanish
 
 - typed Spanish
 - pasted transcript
-- placeholder path for future audio transcript input
-- future push-to-talk transcript input through a speech service or local capture path
+- recorded speech that transcribes and runs through the same coaching contract
+- optional future push-to-talk refinements, without splitting speech into a separate subsystem
 
 ### Output Panel
 
 The app should present:
 
-- original user input
+- transcript or original input
 - corrected Spanish
 - more natural phrasing
-- English explanation
+- concise English explanation
+- typed error tags with severity
+- retry prompt
+- suggested follow-up prompt
+- richer drill suggestions derived from saved history
 - vocabulary notes
-- pronunciation watch-outs
-- suggested follow-up reply
+- lightweight pronunciation hints
+- review recommendation
+- listening recommendations when a scenario has a matching pack
 
 ### Conversation Modes
 
 - tutor mode
 - roleplay mode
-- Costa Rica scenario mode
+- Costa Rica scenario mode with structured turns and branches
 - couple turn-taking mode
 
 ### Difficulty Levels
@@ -54,17 +59,38 @@ Track recurring issues such as:
 - prepositions
 - tense selection
 - literal translations from English
+- register and naturalness mismatches
+- clarity/repair-needed turns
 
 ### Session History
 
 Each session should be able to capture:
 
 - date
-- prompt or scenario
-- learner reply
+- learner
+- scenario id plus scenario snapshot
+- scenario variant and turn context
+- input mode
+- transcript or learner reply
 - corrected reply
-- error tags
+- natural reply
+- retry prompt
+- follow-up prompt
+- typed error tags
+- review recommendation
+- recommended drills
+- couple handoff metadata when applicable
+- listening-pack reference when applicable
 - confidence score
+
+### Review Surface
+
+Each learner should be able to inspect:
+
+- recent mistakes worth retrying
+- recurring tags across saved sessions
+- richer drill recommendations generated from persisted session history
+- listening follow-up suggestions for dictation and shadowing
 
 ## Architecture Notes
 
@@ -73,6 +99,7 @@ Each session should be able to capture:
 - persist sessions, profiles, and activity data in Postgres
 - keep private learner state behind the backend instead of browser-only storage
 - add speech infrastructure as an optional layer that feeds the same text correction pipeline
+- persist structured coaching results so mistake review can be rebuilt later from saved sessions
 - do not block core UX on speech integration
 - keep server contracts portable so a future iPhone/native client can reuse them
 
@@ -89,3 +116,4 @@ Each session should be able to capture:
 - keep the UI polished, native-feeling, and fast to launch on Apple devices
 - let the client talk only to the shared backend API instead of duplicating business logic locally
 - keep the server contracts stable so the Apple client and the web client can share the same backend behaviors
+- expose the same retry-first structured feedback and learner review surfaces as the web reference implementation

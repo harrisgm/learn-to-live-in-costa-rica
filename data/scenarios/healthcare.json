@@ -3,14 +3,259 @@
   "title": "Pharmacy or Clinic",
   "setting": "Pharmacy counter or basic clinic visit",
   "difficulty": "beginner+",
-  "userGoal": "Explain symptoms, ask for help, and understand simple instructions.",
-  "mustKnowVocabulary": ["dolor", "medicina", "receta", "fiebre", "cita"],
+  "userGoal": "Describe symptoms, ask for help, and understand simple instructions.",
+  "mustKnowVocabulary": [
+    "dolor",
+    "medicina",
+    "receta",
+    "fiebre",
+    "cita",
+    "dosis"
+  ],
   "starterPrompts": [
     "Tengo dolor de cabeza desde ayer.",
     "Que medicina me recomienda?"
   ],
   "culturalNotes": [
-    "Healthcare language should stay simple and precise.",
-    "Learners should practice symptoms, timing, and basic instructions."
+    "Healthcare language should stay simple, clear, and direct.",
+    "It helps to say when the symptom started and where it hurts.",
+    "Learners should practice listening for dosage and timing instructions."
+  ],
+  "partnerRoles": [
+    "patient",
+    "pharmacist"
+  ],
+  "likelyMisunderstandings": [
+    "The learner may describe the symptom but forget when it started.",
+    "The pharmacist may give dosage instructions quickly or bundle them together.",
+    "The learner may confuse a clinic appointment with a pharmacy question."
+  ],
+  "variants": [
+    {
+      "id": "pharmacy-counter",
+      "title": "Pharmacy counter",
+      "setup": "You are asking for medicine at a busy pharmacy.",
+      "localReplyStyle": "The pharmacist asks a short symptom question and then gives dosage details.",
+      "pressureNote": "Listen for the medicine name, how often to take it, and whether food matters.",
+      "starterPrompt": "Tengo dolor de garganta y un poco de fiebre."
+    },
+    {
+      "id": "clinic-reception",
+      "title": "Clinic reception",
+      "setup": "You are calling or speaking to the front desk at a small clinic.",
+      "localReplyStyle": "The receptionist asks for name, reason, and the next available appointment.",
+      "pressureNote": "The answer may include a date and a time in one sentence.",
+      "starterPrompt": "Necesito una cita para esta semana."
+    },
+    {
+      "id": "night-symptoms",
+      "title": "Night symptoms",
+      "setup": "You are explaining a symptom that started last night.",
+      "localReplyStyle": "The helper may ask whether it is urgent or if you already took medicine.",
+      "pressureNote": "Use simple timing words like ayer, hoy, and desde anoche.",
+      "starterPrompt": "Desde anoche tengo dolor y fiebre."
+    }
+  ],
+  "turns": [
+    {
+      "id": "healthcare-turn-1",
+      "title": "Describe the symptom",
+      "learnerGoal": "Say the symptom and when it started.",
+      "localRole": "pharmacist",
+      "prompt": "Buenos dias. Que le duele y desde cuando?",
+      "listenFor": [
+        "symptom",
+        "time",
+        "body part",
+        "started"
+      ],
+      "repairCue": "If the learner only names the symptom, ask when it started.",
+      "branchOptions": [
+        {
+          "id": "healthcare-turn-1-headache",
+          "label": "Headache",
+          "prompt": "Tengo dolor de cabeza desde ayer.",
+          "nextTurnId": "healthcare-turn-2"
+        },
+        {
+          "id": "healthcare-turn-1-fever",
+          "label": "Fever",
+          "prompt": "Tengo fiebre desde anoche.",
+          "nextTurnId": "healthcare-turn-2"
+        }
+      ],
+      "recommendedDrillIds": [
+        "healthcare-retry-symptom",
+        "healthcare-dictation-dose"
+      ],
+      "listeningPackId": "healthcare-pharmacy-fast"
+    },
+    {
+      "id": "healthcare-turn-2",
+      "title": "Understand the instruction",
+      "learnerGoal": "Listen for the medicine and the dose.",
+      "localRole": "pharmacist",
+      "prompt": "Le recomiendo esta medicina. Tome una cada ocho horas con comida.",
+      "listenFor": [
+        "medicine",
+        "dose",
+        "every eight hours",
+        "with food"
+      ],
+      "repairCue": "If the learner misses the schedule, repeat only the timing phrase.",
+      "branchOptions": [
+        {
+          "id": "healthcare-turn-2-dose",
+          "label": "Confirm the dose",
+          "prompt": "Una cada ocho horas con comida, verdad?",
+          "nextTurnId": "healthcare-turn-3"
+        },
+        {
+          "id": "healthcare-turn-2-name",
+          "label": "Ask the medicine name",
+          "prompt": "Como se llama la medicina?",
+          "nextTurnId": "healthcare-turn-3"
+        }
+      ],
+      "recommendedDrillIds": [
+        "healthcare-shadow-dose",
+        "healthcare-contrast-instructions"
+      ],
+      "listeningPackId": "healthcare-pharmacy-fast"
+    },
+    {
+      "id": "healthcare-turn-3",
+      "title": "Close safely",
+      "learnerGoal": "Confirm the next step and thank the helper.",
+      "localRole": "pharmacist",
+      "prompt": "Si empeora, vuelva manana o busque una cita.",
+      "listenFor": [
+        "if worse",
+        "tomorrow",
+        "appointment",
+        "thanks"
+      ],
+      "repairCue": "If the learner only says thanks, ask them to repeat the next step.",
+      "branchOptions": [
+        {
+          "id": "healthcare-turn-3-thanks",
+          "label": "Thank and confirm",
+          "prompt": "Gracias. Entonces tomo una cada ocho horas.",
+          "nextTurnId": "healthcare-turn-end"
+        },
+        {
+          "id": "healthcare-turn-3-appointment",
+          "label": "Ask about appointment",
+          "prompt": "Y si necesito cita, donde la pido?",
+          "nextTurnId": "healthcare-turn-end"
+        }
+      ],
+      "recommendedDrillIds": [
+        "healthcare-partner-handoff"
+      ],
+      "listeningPackId": "healthcare-pharmacy-fast"
+    }
+  ],
+  "followUpDrills": [
+    {
+      "id": "healthcare-retry-symptom",
+      "kind": "retry",
+      "title": "State the symptom clearly",
+      "goal": "Practice symptom plus timing in one short sentence.",
+      "prompt": "Tengo dolor de cabeza desde ayer.",
+      "steps": [
+        "Say the symptom.",
+        "Add when it started.",
+        "Keep the sentence simple."
+      ],
+      "focusTagCodes": [
+        "CLARITY_REPAIR_NEEDED",
+        "LITERAL_TRANSLATION"
+      ]
+    },
+    {
+      "id": "healthcare-contrast-instructions",
+      "kind": "contrast",
+      "title": "Compare two instruction styles",
+      "goal": "Practice repeating a medical instruction in two different ways.",
+      "prompt": "Tome una cada ocho horas con comida. / Tome una tres veces al dia con comida.",
+      "steps": [
+        "Repeat the first version.",
+        "Repeat the second version.",
+        "Notice the timing words."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR",
+        "WORD_ORDER"
+      ],
+      "listeningPackId": "healthcare-pharmacy-fast"
+    },
+    {
+      "id": "healthcare-shadow-dose",
+      "kind": "shadowing",
+      "title": "Shadow the dose line",
+      "goal": "Copy the medicine instruction at natural speed.",
+      "prompt": "Tome una cada ocho horas con comida.",
+      "steps": [
+        "Listen once.",
+        "Repeat the timing phrase.",
+        "Repeat the full line."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR"
+      ],
+      "listeningPackId": "healthcare-pharmacy-fast"
+    },
+    {
+      "id": "healthcare-dictation-dose",
+      "kind": "dictation",
+      "title": "Dictate the medicine line",
+      "goal": "Write the dosage and timing you hear.",
+      "prompt": "Tome una cada ocho horas con comida y vuelva si empeora.",
+      "steps": [
+        "Write the dosage.",
+        "Write the timing.",
+        "Read it back carefully."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR",
+        "CLARITY_REPAIR_NEEDED"
+      ],
+      "listeningPackId": "healthcare-pharmacy-fast"
+    },
+    {
+      "id": "healthcare-partner-handoff",
+      "kind": "partner-handoff",
+      "title": "Split symptoms and instructions",
+      "goal": "Let one partner explain the symptom and the other repeat the instruction.",
+      "prompt": "Partner A explains the symptom. Partner B repeats the medicine instruction.",
+      "steps": [
+        "Partner A says what hurts.",
+        "Partner B repeats the dose.",
+        "Switch roles and repeat."
+      ],
+      "focusTagCodes": [
+        "WORD_ORDER"
+      ]
+    }
+  ],
+  "coupleSupport": {
+    "sharedGoal": "One partner explains the problem while the other keeps track of the medicine or appointment details.",
+    "partnerRoles": [
+      "Partner A describes the symptom and timing",
+      "Partner B repeats the dose or appointment detail"
+    ],
+    "handoffPrompts": [
+      "Ahora tu pareja repite la instruccion de la medicina.",
+      "Tu turno: confirma la cita o el horario."
+    ],
+    "keepBothInvolvedTip": "Split the symptom story from the instruction story so both partners have a job."
+  },
+  "listeningCues": [
+    {
+      "packId": "healthcare-pharmacy-fast",
+      "focus": "medicine names and dosage timing",
+      "previewLine": "Tome una cada ocho horas con comida y vuelva si empeora."
+    }
   ]
 }

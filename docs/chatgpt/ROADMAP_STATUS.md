@@ -19,7 +19,7 @@ What is done:
 
 ## Milestone 1: Text Coach
 
-Status: Foundation complete, product loop still needs hardening
+Status: Strong partial, structured loop now present
 
 What is done:
 
@@ -27,12 +27,16 @@ What is done:
 - correction route exists
 - backend/persistence foundation exists
 - session history exists
+- structured coaching schema now exists across backend, web, and Apple
+- retry prompt, follow-up prompt, and review recommendation are persisted
+- recent mistake and recurring-tag review summary exists
+- richer drill recommendations, couple handoff metadata, and listening references now exist in the shared contract
 
 What still needs work:
 
-- stronger correction UX consistency
-- better recurring-error handling
-- more polished scenario-driven usage
+- better drill ranking and review cadence
+- more polished scenario progression and turn generation
+- more real-world content depth inside each high-value scenario
 
 ## Milestone 2: Scenario Engine
 
@@ -43,10 +47,11 @@ What is done:
 - scenario data exists
 - scenario selection exists
 - roleplay/system prompts exist
+- the core daily-life scenario families now have structured turns, branches, and follow-up drills
 
 What still needs work:
 
-- richer scenario-turn generation
+- richer scenario-turn generation across more variants
 - improvement tracking by scenario
 - stronger product loop around scenarios
 
@@ -58,6 +63,7 @@ What is done:
 
 - couple-mode prompt/assets exist
 - couple practice is recognized as a core workstream
+- shared couple handoff metadata now exists in the session contract
 
 What still needs work:
 
@@ -67,7 +73,7 @@ What still needs work:
 
 ## Milestone 4: Audio Prototype
 
-Status: Partial
+Status: Product-aligned partial
 
 What is done:
 
@@ -75,6 +81,8 @@ What is done:
 - native mic path exists
 - transcription route exists
 - speech playback exists
+- speech now feeds the same coaching contract as text
+- web and Apple clients can go from recording to transcript-backed coaching feedback
 
 What still needs work:
 
@@ -89,10 +97,12 @@ What is done:
 
 - listening is explicitly on the roadmap
 - starter dictation/worksheet direction exists
+- starter listening packs now exist for the core scenario families
+- transcript/session data can now seed listening follow-up
 
 What still needs work:
 
-- real transcript packs
+- broader transcript packs
 - speed ladders
 - compare/dictation workflows
 - local-accent exposure
@@ -125,11 +135,11 @@ What still needs work:
 
 ## Recommended Current Priority Order
 
-1. Hardening Milestone 1: Text Coach
-2. Advancing Milestone 2: Scenario Engine
-3. Advancing Milestone 3: Couple Mode
-4. Beginning a real Milestone 5: Listening Lab starter pack
-5. Continuing selective Apple polish only where it improves household usability directly
+1. Deepen Milestone 2: Scenario Engine around the new structured loop and richer variants
+2. Advance Milestone 3: Couple Mode on top of shared retry/review mechanics
+3. Expand Milestone 5: Listening Lab beyond the starter packs using the new session contract
+4. Continue selective Apple polish only where it improves household usability directly
+5. Tune review/drill generation without overbuilding speech
 
 ## What Should Explicitly Wait
 

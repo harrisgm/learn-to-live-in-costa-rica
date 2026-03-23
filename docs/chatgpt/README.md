@@ -10,6 +10,7 @@ These files are meant to:
 
 - summarize current repo truth
 - seed high-value ChatGPT project threads
+- define how ChatGPT lanes, rollovers, and handoffs should work
 - track decisions, priorities, and milestone status
 - reduce handoff overhead between steward threads
 
@@ -33,6 +34,31 @@ These files are public and repo-safe. They should stay generic, reusable, and fr
   - curriculum/content/scenario status snapshot
 - [ROADMAP_STATUS.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/ROADMAP_STATUS.md)
   - milestone-by-milestone status snapshot
+
+## Operating Pack
+
+Use these docs when you want the full ChatGPT Project operating system instead of only the two legacy seed threads:
+
+- [LANE_MAP.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/LANE_MAP.md)
+  - recommended lane structure, ownership boundaries, routing guide, and source-of-truth order
+- [HANDOFF_PROTOCOL.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/HANDOFF_PROTOCOL.md)
+  - canonical handoff packet, rollover rules, and ChatGPT-to-Codex transfer rules
+- [THREAD_TEMPLATE.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/THREAD_TEMPLATE.md)
+  - copy-paste templates for new threads, successor threads, cross-lane requests, and Codex handoffs
+- [STEWARD_OPERATING_RHYTHM.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/STEWARD_OPERATING_RHYTHM.md)
+  - ChatGPT-side control-tower cadence and week-to-week operating rhythm
+- [LANE_BOOTSTRAP_PROMPTS.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/LANE_BOOTSTRAP_PROMPTS.md)
+  - copy-paste prompt starters for command, specialist, factory, and steward lanes
+
+## Recommended Launch Order
+
+If you are standing up or refreshing the ChatGPT Project side now:
+
+1. Start or refresh `90_STEWARD_THREAD` first.
+2. Keep `00_MASTER_PLAN` as the strategy lane.
+3. Keep `08_PROGRESS_TRACKER` as the weekly operating lane.
+4. Open only the specialist lanes that match the current active workstream.
+5. Use handoff packets whenever work moves between lanes or back to Codex.
 
 ## Use With `00_MASTER_PLAN`
 
@@ -119,3 +145,5 @@ Use:
 - [../stewardship/HANDOFF_SUMMARY_TEMPLATE.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/HANDOFF_SUMMARY_TEMPLATE.md)
 
 when opening, running, or closing a steward thread.
+
+Use the new operating-pack docs in this folder for ChatGPT lane structure, thread bootstrap, and packet format.

@@ -5,8 +5,8 @@ Last updated: 2026-03-22
 ## Overall View
 
 The project now has a meaningful starter content base, but it is still early.
-The strongest content areas are foundational curriculum structure, scenario/vocab starters, and reusable prompt packs.
-The thinnest areas are listening depth, systematic couple workflows, and a more mature progression beyond the first few weeks.
+The strongest content areas are foundational curriculum structure, structured scenario packs, reusable prompt packs, and the first listening starter packs.
+The thinnest areas are broader listening depth, more systematic couple workflows, and a more mature progression beyond the first few weeks.
 
 ## Workstream Status
 
@@ -30,17 +30,18 @@ Still thin:
 
 ## Listening
 
-Status: Red-Yellow
+Status: Yellow
 
 Already present:
 
 - listening has a clear place in the roadmap
 - transcript folder exists
 - at least one dictation-oriented worksheet exists
+- starter listening packs now exist for the core Costa Rica scenario families
 
 Still thin:
 
-- real transcript packs
+- broader transcript packs
 - speed ladders
 - natural-speed local speech exposure packs
 - systematic compare/dictation workflow
@@ -65,13 +66,15 @@ Still thin:
 
 ## Costa Rica Living Pack
 
-Status: Yellow-Green
+Status: Green-Yellow
 
 Already present:
 
 - scenarios for grocery, landlord, property visit, bank, immigration, healthcare, utilities, repair, and neighbor small talk
 - Costa Rica-specific vocab starter files
 - roleplay prompts aligned to practical daily-life situations
+- structured branching and follow-up drills for the highest-value daily-life scenarios
+- listening cue links and starter packs for the core scenario families
 
 Still thin:
 
@@ -88,6 +91,7 @@ Already present:
 - couple-mode prompt
 - couple vocab starter
 - partner warmup/speaking drill content
+- shared couple handoff metadata in the learning contract
 
 Still thin:
 
@@ -97,7 +101,7 @@ Still thin:
 
 ## App-Supported Learning Loop
 
-Status: Yellow-Green
+Status: Green-Yellow
 
 Already present:
 
@@ -105,11 +109,14 @@ Already present:
 - session history exists
 - correction flow exists
 - native/web surfaces exist
+- structured coaching contract exists across web and native
+- recurring tags and recent-mistake review summary exist
+- retry prompts and follow-up prompts are persisted in the session layer
+- richer drills, couple handoffs, and listening recommendations now ride on the same session contract
 
 Still thin:
 
-- scenario-driven statefulness
-- better recurring-error surfacing
+- richer scenario-driven statefulness
 - listening-lab productization
 - stronger couple-mode mechanics
 

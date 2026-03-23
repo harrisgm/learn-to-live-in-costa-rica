@@ -16,6 +16,9 @@ Last updated: 2026-03-22
 
 - V1 remains text-first at its core.
 - Speech matters, but it should feed the existing correction flow rather than redefine the product.
+- The shared coaching contract should stay structured and machine-usable across backend, web, and native clients.
+- Retry prompts, typed error tags, and review recommendations are now part of the canonical learner loop, not optional extras.
+- Scenario branches, couple handoff metadata, and listening references should be captured in the same shared contract rather than split into separate feature-specific formats.
 - The correction UX and scenario usefulness matter more than advanced speech infrastructure right now.
 - The project should stay focused on real-life fluency for Costa Rica rather than academic-only Spanish.
 

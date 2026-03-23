@@ -1,9 +1,10 @@
-import { readFile, readdir } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import type {
   BootstrapPayload,
   LearnerProfile,
+  ListeningPackRecord,
   PromptBundle,
   ScenarioRecord
 } from "@/lib/data/contracts";
@@ -16,6 +17,7 @@ const promptsRoot = path.join(repoRoot, "prompts");
 
 let learnersCache: LearnerProfile[] | null = null;
 let scenariosCache: ScenarioRecord[] | null = null;
+let listeningPacksCache: ListeningPackRecord[] | null = null;
 const promptCache = new Map<string, PromptBundle>();
 
 async function readJsonFile<T>(filePath: string) {
@@ -65,6 +67,36 @@ export async function loadScenarios() {
   return scenariosCache;
 }
 
+export async function loadListeningPacks() {
+  if (listeningPacksCache) {
+    return listeningPacksCache;
+  }
+
+  const listeningDir = path.join(dataRoot, "listening");
+  let entries: string[] = [];
+
+  try {
+    entries = await readdir(listeningDir);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      listeningPacksCache = [];
+      return listeningPacksCache;
+    }
+
+    throw error;
+  }
+
+  const listeningFiles = entries.filter((entry) => entry.endsWith(".json")).sort();
+
+  listeningPacksCache = await Promise.all(
+    listeningFiles.map((entry) =>
+      readJsonFile<ListeningPackRecord>(path.join(listeningDir, entry))
+    )
+  );
+
+  return listeningPacksCache;
+}
+
 function correctionPromptName(difficulty: Difficulty) {
   return difficulty === "beginner" || difficulty === "beginner+"
     ? "beginner"
@@ -83,8 +115,27 @@ function systemPromptName(mode: PracticeMode) {
   return "tutor-mode";
 }
 
-export async function loadPromptBundle(mode: PracticeMode, difficulty: Difficulty) {
-  const cacheKey = `${mode}:${difficulty}`;
+async function loadOptionalScenarioPrompt(scenarioId?: string) {
+  if (!scenarioId) {
+    return undefined;
+  }
+
+  const scenarioPromptPath = path.join(promptsRoot, "roleplay", `${scenarioId}.md`);
+
+  try {
+    await access(scenarioPromptPath);
+    return await readMarkdown(scenarioPromptPath);
+  } catch {
+    return undefined;
+  }
+}
+
+export async function loadPromptBundle(
+  mode: PracticeMode,
+  difficulty: Difficulty,
+  scenarioId?: string
+) {
+  const cacheKey = `${mode}:${difficulty}:${scenarioId ?? "none"}`;
   const cached = promptCache.get(cacheKey);
 
   if (cached) {
@@ -101,7 +152,8 @@ export async function loadPromptBundle(mode: PracticeMode, difficulty: Difficult
     ),
     systemPrompt: await readMarkdown(
       path.join(promptsRoot, "system", `${systemPromptName(mode)}.md`)
-    )
+    ),
+    scenarioPrompt: await loadOptionalScenarioPrompt(scenarioId)
   };
 
   promptCache.set(cacheKey, bundle);
@@ -118,15 +170,22 @@ export async function findScenario(scenarioId: string) {
   return scenarios.find((scenario) => scenario.id === scenarioId) ?? null;
 }
 
+export async function findListeningPack(listeningPackId: string) {
+  const listeningPacks = await loadListeningPacks();
+  return listeningPacks.find((pack) => pack.id === listeningPackId) ?? null;
+}
+
 export async function loadBootstrapPayload(): Promise<BootstrapPayload> {
-  const [learners, scenarios] = await Promise.all([
+  const [learners, scenarios, listeningPacks] = await Promise.all([
     loadLearners(),
-    loadScenarios()
+    loadScenarios(),
+    loadListeningPacks()
   ]);
 
   return {
     learners,
     scenarios,
+    listeningPacks,
     speech: getSpeechCapabilities()
   };
 }

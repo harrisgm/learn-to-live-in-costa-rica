@@ -1,0 +1,50 @@
+{
+  "id": "neighbor-smalltalk-evening",
+  "title": "Neighbor Small Talk Evening",
+  "scenarioId": "neighbor-smalltalk",
+  "difficulty": "beginner+",
+  "focus": "friendly small talk and turn handoffs",
+  "challenge": "The neighbor is warm, casual, and expects a short return question.",
+  "previewLine": "Que dicha. Cualquier cosa me avisan.",
+  "transcript": [
+    {
+      "speaker": "neighbor",
+      "text": "Buenos dias. Ustedes son nuevos por aqui?",
+      "speed": "natural",
+      "note": "Warm opening"
+    },
+    {
+      "speaker": "new resident",
+      "text": "Si, somos nuevos por aqui.",
+      "speed": "natural",
+      "note": "Short reply"
+    },
+    {
+      "speaker": "neighbor",
+      "text": "Que bueno. De donde son ustedes?",
+      "speed": "natural",
+      "note": "Return question"
+    },
+    {
+      "speaker": "neighbor",
+      "text": "Que dicha. Cualquier cosa me avisan.",
+      "speed": "fast",
+      "note": "Friendly closing"
+    }
+  ],
+  "comprehensionChecks": [
+    "What did the neighbor ask first?",
+    "What return question followed?",
+    "What did the neighbor offer at the end?"
+  ],
+  "dictationLine": "Que dicha. Cualquier cosa me avisan.",
+  "shadowingLines": [
+    "Que bueno. De donde son ustedes?",
+    "Que dicha. Cualquier cosa me avisan."
+  ],
+  "cueNotes": [
+    "This pack rewards short, warm answers more than perfect grammar.",
+    "The most important listening skill is catching the return question.",
+    "A friendly closing invitation should feel easy to repeat."
+  ]
+}

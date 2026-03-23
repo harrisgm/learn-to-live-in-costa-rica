@@ -10,7 +10,13 @@
     "difficulty",
     "userGoal",
     "mustKnowVocabulary",
-    "starterPrompts"
+    "starterPrompts",
+    "culturalNotes",
+    "partnerRoles",
+    "likelyMisunderstandings",
+    "variants",
+    "turns",
+    "followUpDrills"
   ],
   "properties": {
     "id": {
@@ -46,6 +52,172 @@
       "items": {
         "type": "string"
       }
+    },
+    "partnerRoles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "likelyMisunderstandings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "variants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/variant"
+      }
+    },
+    "turns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/turn"
+      }
+    },
+    "followUpDrills": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/drill"
+      }
+    },
+    "coupleSupport": {
+      "$ref": "#/$defs/coupleSupport"
+    },
+    "listeningCues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/listeningCue"
+      }
+    }
+  },
+  "$defs": {
+    "variant": {
+      "type": "object",
+      "required": ["id", "title", "setup", "localReplyStyle", "pressureNote"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "setup": { "type": "string" },
+        "localReplyStyle": { "type": "string" },
+        "pressureNote": { "type": "string" },
+        "starterPrompt": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "branchOption": {
+      "type": "object",
+      "required": ["id", "label", "prompt", "nextTurnId"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "prompt": { "type": "string" },
+        "nextTurnId": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "turn": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "learnerGoal",
+        "localRole",
+        "prompt",
+        "listenFor",
+        "repairCue",
+        "branchOptions"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "learnerGoal": { "type": "string" },
+        "localRole": { "type": "string" },
+        "prompt": { "type": "string" },
+        "listenFor": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "repairCue": { "type": "string" },
+        "branchOptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/branchOption"
+          }
+        },
+        "coupleHandoffPrompt": { "type": "string" },
+        "recommendedDrillIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "listeningPackId": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "drill": {
+      "type": "object",
+      "required": ["id", "kind", "title", "goal", "prompt", "steps"],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "retry",
+            "contrast",
+            "roleplay-reset",
+            "shadowing",
+            "dictation",
+            "partner-handoff"
+          ]
+        },
+        "title": { "type": "string" },
+        "goal": { "type": "string" },
+        "prompt": { "type": "string" },
+        "steps": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "focusTagCodes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "listeningPackId": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "coupleSupport": {
+      "type": "object",
+      "required": [
+        "sharedGoal",
+        "partnerRoles",
+        "handoffPrompts",
+        "keepBothInvolvedTip"
+      ],
+      "properties": {
+        "sharedGoal": { "type": "string" },
+        "partnerRoles": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "handoffPrompts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "keepBothInvolvedTip": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "listeningCue": {
+      "type": "object",
+      "required": ["packId", "focus", "previewLine"],
+      "properties": {
+        "packId": { "type": "string" },
+        "focus": { "type": "string" },
+        "previewLine": { "type": "string" }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

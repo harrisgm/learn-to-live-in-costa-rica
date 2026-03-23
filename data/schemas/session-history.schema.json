@@ -17,11 +17,11 @@
           "createdAt",
           "mode",
           "difficulty",
+          "scenarioId",
+          "scenarioSnapshot",
+          "source",
           "userInput",
-          "correctedSpanish",
-          "naturalSpanish",
-          "explanation",
-          "errorTags"
+          "feedback"
         ],
         "properties": {
           "id": {
@@ -37,35 +37,237 @@
           "difficulty": {
             "type": "string"
           },
-          "scenario": {
+          "scenarioId": {
             "type": "string"
+          },
+          "scenarioSnapshot": {
+            "$ref": "#/$defs/scenarioSnapshot"
+          },
+          "source": {
+            "type": "string",
+            "enum": ["text", "paste", "speech"]
           },
           "userInput": {
             "type": "string"
           },
-          "correctedSpanish": {
-            "type": "string"
-          },
-          "naturalSpanish": {
-            "type": "string"
-          },
-          "explanation": {
-            "type": "string"
-          },
-          "errorTags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "confidenceScore": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1
+          "feedback": {
+            "$ref": "#/$defs/feedback"
           }
         },
         "additionalProperties": false
       }
+    }
+  },
+  "$defs": {
+    "scenarioSnapshot": {
+      "type": "object",
+      "required": ["id", "title", "setting", "userGoal"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "setting": { "type": "string" },
+        "userGoal": { "type": "string" },
+        "variantId": { "type": "string" },
+        "variantLabel": { "type": "string" },
+        "turnId": { "type": "string" },
+        "turnLabel": { "type": "string" },
+        "turnPrompt": { "type": "string" },
+        "partnerRole": { "type": "string" },
+        "listeningPackId": { "type": "string" },
+        "listeningPackTitle": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "errorTag": {
+      "type": "object",
+      "required": ["code", "severity", "message"],
+      "properties": {
+        "code": { "type": "string" },
+        "severity": {
+          "type": "string",
+          "enum": ["primary", "secondary"]
+        },
+        "message": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "vocabNote": {
+      "type": "object",
+      "required": ["term", "gloss", "note"],
+      "properties": {
+        "term": { "type": "string" },
+        "gloss": { "type": "string" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "pronunciationHint": {
+      "type": "object",
+      "required": ["term", "hint"],
+      "properties": {
+        "term": { "type": "string" },
+        "hint": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "reviewRecommendation": {
+      "type": "object",
+      "required": ["shouldReview", "reason", "nextStep"],
+      "properties": {
+        "shouldReview": { "type": "boolean" },
+        "reason": { "type": "string" },
+        "nextStep": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "drillStep": {
+      "type": "object",
+      "required": ["label", "prompt"],
+      "properties": {
+        "label": { "type": "string" },
+        "prompt": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "recommendedDrill": {
+      "type": "object",
+      "required": ["id", "kind", "title", "reason", "prompt", "steps"],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "retry",
+            "contrast",
+            "roleplay-reset",
+            "shadowing",
+            "dictation",
+            "partner-handoff"
+          ]
+        },
+        "title": { "type": "string" },
+        "reason": { "type": "string" },
+        "prompt": { "type": "string" },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/drillStep"
+          }
+        },
+        "focusTagCode": { "type": "string" },
+        "scenarioId": { "type": "string" },
+        "scenarioTitle": { "type": "string" },
+        "sourceSessionId": { "type": "string" },
+        "listeningPackId": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "coupleHandoff": {
+      "type": "object",
+      "required": ["leadRole", "supportRole", "handoffPrompt", "coachingTip"],
+      "properties": {
+        "leadRole": { "type": "string" },
+        "supportRole": { "type": "string" },
+        "handoffPrompt": { "type": "string" },
+        "coachingTip": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "listeningRecommendation": {
+      "type": "object",
+      "required": ["packId", "packTitle", "reason", "previewLine"],
+      "properties": {
+        "packId": { "type": "string" },
+        "packTitle": { "type": "string" },
+        "reason": { "type": "string" },
+        "previewLine": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "feedback": {
+      "type": "object",
+      "required": [
+        "provider",
+        "inputMode",
+        "transcriptText",
+        "correctedText",
+        "naturalText",
+        "explanationSummary",
+        "errorTags",
+        "retryPrompt",
+        "followUpPrompt",
+        "vocabNotes",
+        "pronunciationHints",
+        "feedbackMode",
+        "learnerFocus",
+        "scenarioId",
+        "sessionId",
+        "reviewRecommendation",
+        "recommendedDrills",
+        "confidenceScore"
+      ],
+      "properties": {
+        "provider": { "type": "string" },
+        "inputMode": {
+          "type": "string",
+          "enum": ["text", "paste", "speech"]
+        },
+        "transcriptText": { "type": "string" },
+        "correctedText": { "type": "string" },
+        "naturalText": { "type": "string" },
+        "explanationSummary": { "type": "string" },
+        "errorTags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/errorTag"
+          }
+        },
+        "retryPrompt": { "type": "string" },
+        "followUpPrompt": { "type": "string" },
+        "vocabNotes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/vocabNote"
+          }
+        },
+        "pronunciationHints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pronunciationHint"
+          }
+        },
+        "feedbackMode": {
+          "type": "string",
+          "enum": ["gentle", "standard", "detailed", "strict"]
+        },
+        "learnerFocus": {
+          "type": "string",
+          "enum": ["beginner", "survival", "naturalization"]
+        },
+        "scenarioId": { "type": "string" },
+        "sessionId": { "type": "string" },
+        "reviewRecommendation": {
+          "$ref": "#/$defs/reviewRecommendation"
+        },
+        "recommendedDrills": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/recommendedDrill"
+          }
+        },
+        "coupleHandoff": {
+          "$ref": "#/$defs/coupleHandoff"
+        },
+        "listeningRecommendation": {
+          "$ref": "#/$defs/listeningRecommendation"
+        },
+        "confidenceScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

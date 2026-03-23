@@ -11,9 +11,15 @@ export function isPracticeSession(value: unknown): value is PracticeSession {
     typeof session.createdAt === "string" &&
     typeof session.mode === "string" &&
     typeof session.difficulty === "string" &&
-    typeof session.scenario === "string" &&
+    typeof session.scenarioId === "string" &&
+    typeof session.learnerId === "string" &&
+    typeof session.source === "string" &&
     typeof session.userInput === "string" &&
     typeof session.feedback === "object" &&
-    session.feedback !== null
+    session.feedback !== null &&
+    typeof session.feedback.sessionId === "string" &&
+    typeof session.feedback.transcriptText === "string" &&
+    typeof session.feedback.correctedText === "string" &&
+    typeof session.feedback.retryPrompt === "string"
   );
 }

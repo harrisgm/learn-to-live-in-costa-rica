@@ -1,0 +1,50 @@
+{
+  "id": "healthcare-pharmacy-fast",
+  "title": "Healthcare Pharmacy Fast Speech",
+  "scenarioId": "healthcare",
+  "difficulty": "beginner+",
+  "focus": "medicine instructions and timing",
+  "challenge": "The pharmacist gives dosage and timing in one quick, helpful sentence.",
+  "previewLine": "Tome una cada ocho horas con comida y vuelva si empeora.",
+  "transcript": [
+    {
+      "speaker": "pharmacist",
+      "text": "Buenos dias. Que le duele y desde cuando?",
+      "speed": "natural",
+      "note": "Symptom check"
+    },
+    {
+      "speaker": "patient",
+      "text": "Tengo dolor de cabeza desde ayer.",
+      "speed": "natural",
+      "note": "Symptom plus timing"
+    },
+    {
+      "speaker": "pharmacist",
+      "text": "Le recomiendo esta medicina. Tome una cada ocho horas con comida.",
+      "speed": "fast",
+      "note": "Dosage instruction"
+    },
+    {
+      "speaker": "patient",
+      "text": "Gracias. Si empeora, vuelvo manana.",
+      "speed": "natural",
+      "note": "Safety close"
+    }
+  ],
+  "comprehensionChecks": [
+    "How often should the medicine be taken?",
+    "Should it be taken with food?",
+    "What should the patient do if it gets worse?"
+  ],
+  "dictationLine": "Tome una cada ocho horas con comida.",
+  "shadowingLines": [
+    "Tome una cada ocho horas con comida.",
+    "Si empeora, vuelva manana o busque una cita."
+  ],
+  "cueNotes": [
+    "The timing phrase is the most important part to catch.",
+    "Listen for the with-food instruction at the end of the line.",
+    "The follow-up safety advice should stay simple and direct."
+  ]
+}

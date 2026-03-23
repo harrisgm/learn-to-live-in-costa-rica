@@ -31,14 +31,13 @@ struct CoachAPIClient {
         return try await send(request, decode: BootstrapResponse.self)
     }
 
-    func sessions(baseURLString: String, learnerID: String) async throws -> [PracticeSession] {
+    func sessions(baseURLString: String, learnerID: String) async throws -> SessionsResponse {
         let request = try makeRequest(
             baseURLString: baseURLString,
             path: "/api/sessions?learnerId=\(learnerID.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? learnerID)",
             method: "GET"
         )
-        let response = try await send(request, decode: SessionsResponse.self)
-        return response.sessions
+        return try await send(request, decode: SessionsResponse.self)
     }
 
     func runCoach(baseURLString: String, payload: CoachRequest) async throws -> PracticeSession {

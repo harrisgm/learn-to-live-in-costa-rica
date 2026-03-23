@@ -1,6 +1,8 @@
 import type { BootstrapPayload } from "@/lib/data/contracts";
 import type {
   Difficulty,
+  FeedbackMode,
+  LearnerReviewSummary,
   PracticeMode,
   PracticeSession,
   SessionSource
@@ -32,7 +34,9 @@ export async function fetchSessions(learnerId: string) {
     }
   );
 
-  return readJson<{ sessions: PracticeSession[] }>(response);
+  return readJson<{ sessions: PracticeSession[]; review: LearnerReviewSummary }>(
+    response
+  );
 }
 
 export async function runCoach(payload: {
@@ -42,6 +46,10 @@ export async function runCoach(payload: {
   scenarioId: string;
   input: string;
   source: SessionSource;
+  feedbackMode?: FeedbackMode;
+  scenarioVariantId?: string;
+  scenarioTurnId?: string;
+  listeningPackId?: string;
 }) {
   const response = await fetch("/api/coach", {
     method: "POST",

@@ -1,22 +1,21 @@
 "use client";
 
-import {
-  useDeferredValue,
-  useEffect,
-  useState,
-  useTransition
-} from "react";
+import { useDeferredValue, useEffect, useRef, useState } from "react";
 
 import { AudioCapture } from "@/components/audio-capture";
 import type {
   BootstrapPayload,
+  ListeningPackRecord,
+  ScenarioBranchOptionRecord,
   ScenarioRecord
 } from "@/lib/data/contracts";
 import { fetchBootstrap, fetchSessions, runCoach, transcribeAudio } from "@/lib/api";
 import type {
   Difficulty,
+  LearnerReviewSummary,
   PracticeMode,
   PracticeSession,
+  RecommendedDrill,
   SessionSource
 } from "@/lib/types";
 
@@ -39,6 +38,56 @@ function prettyDate(input: string) {
   return new Date(input).toLocaleString();
 }
 
+function confidencePercent(value: number) {
+  return `${Math.round(value * 100)}%`;
+}
+
+function formatTag(code: string) {
+  return code.toLowerCase().replaceAll("_", " ");
+}
+
+function formatDrillKind(kind: RecommendedDrill["kind"]) {
+  return kind.replaceAll("-", " ");
+}
+
+function listeningPacksForScenario(
+  bootstrap: BootstrapPayload | null,
+  scenarioId: string
+) {
+  if (!bootstrap) {
+    return [];
+  }
+
+  return bootstrap.listeningPacks.filter((pack) => pack.scenarioId === scenarioId);
+}
+
+function defaultVariantId(scenario: ScenarioRecord | null) {
+  return scenario?.variants[0]?.id ?? "";
+}
+
+function defaultTurnId(scenario: ScenarioRecord | null) {
+  return scenario?.turns[0]?.id ?? "";
+}
+
+function defaultListeningPackId(
+  bootstrap: BootstrapPayload | null,
+  scenario: ScenarioRecord | null
+) {
+  if (!bootstrap || !scenario) {
+    return "";
+  }
+
+  return (
+    scenario.listeningCues?.[0]?.packId ??
+    listeningPacksForScenario(bootstrap, scenario.id)[0]?.id ??
+    ""
+  );
+}
+
+function practicePromptForDrill(drill: RecommendedDrill) {
+  return drill.steps[0]?.prompt ?? drill.prompt;
+}
+
 export function SessionPlayground() {
   const [bootstrap, setBootstrap] = useState<BootstrapPayload | null>(null);
   const [input, setInput] = useState("Yo necesito ayuda con este formulario.");
@@ -46,15 +95,24 @@ export function SessionPlayground() {
   const [difficulty, setDifficulty] = useState<Difficulty>("beginner");
   const [selectedLearnerId, setSelectedLearnerId] = useState("");
   const [selectedScenarioId, setSelectedScenarioId] = useState("");
+  const [selectedVariantId, setSelectedVariantId] = useState("");
+  const [selectedTurnId, setSelectedTurnId] = useState("");
+  const [selectedListeningPackId, setSelectedListeningPackId] = useState("");
   const [inputSource, setInputSource] = useState<SessionSource>("text");
   const [sessions, setSessions] = useState<PracticeSession[]>([]);
+  const [review, setReview] = useState<LearnerReviewSummary | null>(null);
   const [activeSession, setActiveSession] = useState<PracticeSession | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingBootstrap, setIsLoadingBootstrap] = useState(true);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [audioStatus, setAudioStatus] = useState<string | null>(null);
+  const currentLearnerIdRef = useRef(selectedLearnerId);
   const deferredInput = useDeferredValue(input);
+
+  useEffect(() => {
+    currentLearnerIdRef.current = selectedLearnerId;
+  }, [selectedLearnerId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -67,9 +125,13 @@ export function SessionPlayground() {
           return;
         }
 
+        const initialScenario = payload.scenarios[0] ?? null;
         setBootstrap(payload);
         setSelectedLearnerId(payload.learners[0]?.id ?? "");
-        setSelectedScenarioId(payload.scenarios[0]?.id ?? "");
+        setSelectedScenarioId(initialScenario?.id ?? "");
+        setSelectedVariantId(defaultVariantId(initialScenario));
+        setSelectedTurnId(defaultTurnId(initialScenario));
+        setSelectedListeningPackId(defaultListeningPackId(payload, initialScenario));
       } catch (error) {
         if (!cancelled) {
           setErrorMessage(
@@ -92,8 +154,105 @@ export function SessionPlayground() {
     };
   }, []);
 
+  const currentScenario =
+    bootstrap?.scenarios.find((scenario) => scenario.id === selectedScenarioId) ??
+    null;
+  const currentLearner =
+    bootstrap?.learners.find((learner) => learner.id === selectedLearnerId) ?? null;
+  const scenarioListeningPacks = listeningPacksForScenario(
+    bootstrap,
+    selectedScenarioId
+  );
+  const currentVariant =
+    currentScenario?.variants.find((variant) => variant.id === selectedVariantId) ??
+    currentScenario?.variants[0] ??
+    null;
+  const currentTurn =
+    currentScenario?.turns.find((turn) => turn.id === selectedTurnId) ??
+    currentScenario?.turns[0] ??
+    null;
+  const currentListeningPack =
+    scenarioListeningPacks.find((pack) => pack.id === selectedListeningPackId) ??
+    scenarioListeningPacks[0] ??
+    null;
+  const topRecurring = review?.recurringTags[0] ?? null;
+
+  useEffect(() => {
+    if (!bootstrap || !currentScenario) {
+      return;
+    }
+
+    setSelectedVariantId((current) =>
+      currentScenario.variants.some((variant) => variant.id === current)
+        ? current
+        : defaultVariantId(currentScenario)
+    );
+    setSelectedTurnId((current) =>
+      currentScenario.turns.some((turn) => turn.id === current)
+        ? current
+        : defaultTurnId(currentScenario)
+    );
+
+    const listeningPackIds = new Set(
+      scenarioListeningPacks.map((pack) => pack.id)
+    );
+    setSelectedListeningPackId((current) =>
+      current && listeningPackIds.has(current)
+        ? current
+        : defaultListeningPackId(bootstrap, currentScenario)
+    );
+  }, [bootstrap, currentScenario, scenarioListeningPacks]);
+
+  async function refreshLearnerSessions(
+    learnerId: string,
+    preferredSessionId?: string
+  ) {
+    setIsLoadingSessions(true);
+
+    try {
+      const payload = await fetchSessions(learnerId);
+
+      if (currentLearnerIdRef.current !== learnerId) {
+        return;
+      }
+
+      setSessions(payload.sessions);
+      setReview(payload.review);
+      setActiveSession((current) => {
+        if (preferredSessionId) {
+          return (
+            payload.sessions.find((session) => session.id === preferredSessionId) ??
+            payload.sessions[0] ??
+            null
+          );
+        }
+
+        if (current) {
+          return (
+            payload.sessions.find((session) => session.id === current.id) ??
+            payload.sessions[0] ??
+            null
+          );
+        }
+
+        return payload.sessions[0] ?? null;
+      });
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to load learner sessions."
+      );
+    } finally {
+      setIsLoadingSessions(false);
+    }
+  }
+
   useEffect(() => {
     if (!selectedLearnerId) {
+      setSessions([]);
+      setReview(null);
+      setActiveSession(null);
       return;
     }
 
@@ -109,6 +268,7 @@ export function SessionPlayground() {
         }
 
         setSessions(payload.sessions);
+        setReview(payload.review);
         setActiveSession(payload.sessions[0] ?? null);
       } catch (error) {
         if (!cancelled) {
@@ -132,77 +292,108 @@ export function SessionPlayground() {
     };
   }, [selectedLearnerId]);
 
-  const currentScenario =
-    bootstrap?.scenarios.find((scenario) => scenario.id === selectedScenarioId) ??
-    null;
+  async function submitCoach(rawInput: string, source: SessionSource) {
+    const trimmed = rawInput.trim();
+    const requestLearnerId = selectedLearnerId;
 
-  const currentLearner =
-    bootstrap?.learners.find((learner) => learner.id === selectedLearnerId) ?? null;
-
-  function handleRunCoach() {
-    const trimmed = input.trim();
-
-    if (!trimmed || !selectedLearnerId || !selectedScenarioId) {
+    if (!trimmed || !requestLearnerId || !selectedScenarioId) {
       return;
     }
 
     setErrorMessage(null);
+    setIsSubmitting(true);
 
-    startTransition(() => {
-      void runCoach({
-        learnerId: selectedLearnerId,
+    try {
+      const { session } = await runCoach({
+        learnerId: requestLearnerId,
         mode,
         difficulty,
         scenarioId: selectedScenarioId,
         input: trimmed,
-        source: inputSource
-      })
-        .then(({ session }) => {
-          setSessions((current) => [session, ...current].slice(0, 10));
-          setActiveSession(session);
-          setInputSource("text");
-        })
-        .catch((error) => {
-          setErrorMessage(
-            error instanceof Error ? error.message : "Coach request failed."
-          );
-        });
-    });
+        source,
+        scenarioVariantId: selectedVariantId || undefined,
+        scenarioTurnId: selectedTurnId || undefined,
+        listeningPackId: selectedListeningPackId || undefined
+      });
+
+      if (currentLearnerIdRef.current !== requestLearnerId) {
+        return;
+      }
+
+      setActiveSession(session);
+      setInputSource(source);
+      await refreshLearnerSessions(requestLearnerId, session.id);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Coach request failed."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  function handleRunCoach() {
+    void submitCoach(input, inputSource);
   }
 
   async function handleTranscript(audio: Blob) {
     const { transcript, warning } = await transcribeAudio(audio);
     setInput(transcript);
     setInputSource("speech");
-    if (warning) {
-      setErrorMessage(warning);
-    } else {
-      setErrorMessage(null);
+    setErrorMessage(warning ?? null);
+
+    if (!transcript.trim()) {
+      return;
     }
+
+    setAudioStatus("Running coach from the transcript...");
+    await submitCoach(transcript, "speech");
+    setAudioStatus(null);
   }
 
-  function resolveScenarioTitle(
-    scenarioId: string,
-    scenarioList: ScenarioRecord[] | undefined
-  ) {
-    return scenarioList?.find((item) => item.id === scenarioId)?.title ?? scenarioId;
+  function loadIntoComposer(text: string, source: SessionSource = "text") {
+    setInput(text);
+    setInputSource(source);
+    setErrorMessage(null);
+  }
+
+  function handleBranchAdvance(branch: ScenarioBranchOptionRecord) {
+    const nextTurn =
+      currentScenario?.turns.find((turn) => turn.id === branch.nextTurnId) ?? null;
+
+    setSelectedTurnId(branch.nextTurnId);
+
+    if (nextTurn?.listeningPackId) {
+      setSelectedListeningPackId(nextTurn.listeningPackId);
+    }
+
+    loadIntoComposer(branch.prompt);
+  }
+
+  function loadListeningLine(pack: ListeningPackRecord, modeSource: SessionSource = "text") {
+    loadIntoComposer(pack.dictationLine, modeSource);
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+    <div className="grid gap-6 lg:grid-cols-[1.18fr_0.82fr]">
       <section className="panel">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="eyebrow">Shared coach workspace</p>
-            <h2 className="section-title">Local network text and speech practice</h2>
+            <h2 className="section-title">Scenario loop, couple flow, and listening lab</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <span className="pill bg-palm/10 text-palm">Backend-backed</span>
             <span className="pill bg-ocean/10 text-ocean">
               {bootstrap?.speech.enabled
                 ? `Speech ${bootstrap.speech.provider}`
-                : "Speech ready"}
+                : "Text-first"}
             </span>
+            {topRecurring ? (
+              <span className="pill bg-terracotta/10 text-terracotta">
+                Review {formatTag(topRecurring.code)}
+              </span>
+            ) : null}
           </div>
         </div>
 
@@ -233,7 +424,10 @@ export function SessionPlayground() {
 
               <label className="field">
                 <span>Mode</span>
-                <select value={mode} onChange={(event) => setMode(event.target.value as PracticeMode)}>
+                <select
+                  value={mode}
+                  onChange={(event) => setMode(event.target.value as PracticeMode)}
+                >
                   {modeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -271,9 +465,25 @@ export function SessionPlayground() {
               </label>
             </div>
 
-            <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_0.4fr]">
+            <div className="mt-4 grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="rounded-[1.5rem] border border-coffee/10 bg-sand/45 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                <div className="flex flex-wrap gap-2">
+                  <span className="pill bg-palm/10 text-palm">
+                    {currentScenario?.difficulty ?? "scenario"}
+                  </span>
+                  {currentVariant ? (
+                    <span className="pill bg-ocean/10 text-ocean">
+                      Variant {currentVariant.title}
+                    </span>
+                  ) : null}
+                  {currentTurn ? (
+                    <span className="pill bg-terracotta/10 text-terracotta">
+                      Turn {currentTurn.title}
+                    </span>
+                  ) : null}
+                </div>
+
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-palm">
                   Scenario focus
                 </p>
                 <h3 className="mt-2 text-xl font-semibold text-coffee">
@@ -285,29 +495,244 @@ export function SessionPlayground() {
                 <p className="mt-3 text-sm leading-6 text-coffee/75">
                   Goal: {currentScenario?.userGoal ?? "Choose a scenario to set the coaching target."}
                 </p>
-                <p className="mt-3 text-sm leading-6 text-coffee/75">
-                  Starter prompts:{" "}
-                  {currentScenario?.starterPrompts.join(" • ") ??
-                    "Starter prompts will load from repo data."}
-                </p>
+
+                <div className="mt-4 grid gap-4 md:grid-cols-3">
+                  <label className="field">
+                    <span>Variant</span>
+                    <select
+                      value={selectedVariantId}
+                      onChange={(event) => setSelectedVariantId(event.target.value)}
+                    >
+                      {currentScenario?.variants.map((variant) => (
+                        <option key={variant.id} value={variant.id}>
+                          {variant.title}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="field">
+                    <span>Turn</span>
+                    <select
+                      value={selectedTurnId}
+                      onChange={(event) => setSelectedTurnId(event.target.value)}
+                    >
+                      {currentScenario?.turns.map((turn) => (
+                        <option key={turn.id} value={turn.id}>
+                          {turn.title}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="field">
+                    <span>Listening pack</span>
+                    <select
+                      value={selectedListeningPackId}
+                      onChange={(event) => setSelectedListeningPackId(event.target.value)}
+                    >
+                      {scenarioListeningPacks.length > 0 ? (
+                        scenarioListeningPacks.map((pack) => (
+                          <option key={pack.id} value={pack.id}>
+                            {pack.title}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="">No linked pack yet</option>
+                      )}
+                    </select>
+                  </label>
+                </div>
+
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                  <div className="rounded-[1.3rem] border border-coffee/10 bg-white/70 px-4 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                      Current branch
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-coffee/80">
+                      {currentTurn?.prompt ?? "Choose a turn to anchor the next reply."}
+                    </p>
+                    <p className="mt-3 text-xs uppercase tracking-[0.16em] text-coffee/55">
+                      Listen for
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-coffee/75">
+                      {currentTurn?.listenFor.join(" • ") ??
+                        "Turn-specific listening targets will appear here."}
+                    </p>
+                    <p className="mt-3 text-xs uppercase tracking-[0.16em] text-coffee/55">
+                      Repair cue
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-coffee/75">
+                      {currentTurn?.repairCue ??
+                        "Useful repair guidance will appear once the turn is selected."}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[1.3rem] border border-coffee/10 bg-white/70 px-4 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                      Costa Rica realism
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-coffee/80">
+                      {currentVariant?.setup ??
+                        "Variant details will appear here when the scenario loads."}
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-coffee/75">
+                      Reply style: {currentVariant?.localReplyStyle ?? "Not set"}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-coffee/75">
+                      Pressure note: {currentVariant?.pressureNote ?? "Not set"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-4 lg:grid-cols-3">
+                  <div className="rounded-[1.3rem] border border-coffee/10 bg-white/70 px-4 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                      Likely misunderstandings
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-coffee/75">
+                      {currentScenario?.likelyMisunderstandings.join(" • ") ??
+                        "Misunderstanding cues will load from the scenario pack."}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[1.3rem] border border-coffee/10 bg-white/70 px-4 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                      Couple support
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-coffee/75">
+                      Roles:{" "}
+                      {currentScenario?.coupleSupport?.partnerRoles.join(" • ") ??
+                        currentScenario?.partnerRoles.join(" • ") ??
+                        "Partner roles will appear here."}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-coffee/75">
+                      {currentScenario?.coupleSupport?.keepBothInvolvedTip ??
+                        "Couple-specific handoff guidance will appear here."}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[1.3rem] border border-coffee/10 bg-white/70 px-4 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                      Learner profile
+                    </p>
+                    <h3 className="mt-3 text-lg font-semibold text-coffee">
+                      {currentLearner?.displayName ?? "Loading learner"}
+                    </h3>
+                    <p className="mt-2 text-sm text-coffee/75">
+                      Level: {currentLearner?.learnerLevel ?? "Unknown"}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-coffee/75">
+                      {currentLearner?.confidenceNotes ??
+                        "Learner notes will appear when the backend profile loads."}
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="rounded-[1.5rem] border border-coffee/10 bg-white/70 px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
-                  Learner profile
+                  Listening Lab starter
                 </p>
-                <h3 className="mt-2 text-xl font-semibold text-coffee">
-                  {currentLearner?.displayName ?? "Loading learner"}
-                </h3>
-                <p className="mt-2 text-sm text-coffee/75">
-                  Level: {currentLearner?.learnerLevel ?? "Unknown"}
-                </p>
-                <p className="mt-3 text-sm leading-6 text-coffee/75">
-                  {currentLearner?.confidenceNotes ??
-                    "Learner notes will appear when the backend profile loads."}
-                </p>
+                {currentListeningPack ? (
+                  <div className="mt-3 space-y-4">
+                    <div>
+                      <h3 className="text-xl font-semibold text-coffee">
+                        {currentListeningPack.title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-6 text-coffee/75">
+                        {currentListeningPack.challenge}
+                      </p>
+                    </div>
+
+                    <div className="rounded-[1.2rem] border border-coffee/10 bg-sand/35 px-4 py-4">
+                      <p className="text-xs uppercase tracking-[0.16em] text-coffee/55">
+                        Preview line
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-coffee/80">
+                        {currentListeningPack.previewLine}
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-xs uppercase tracking-[0.16em] text-coffee/55">
+                        Comprehension checks
+                      </p>
+                      {currentListeningPack.comprehensionChecks.map((question) => (
+                        <p
+                          key={question}
+                          className="text-sm leading-6 text-coffee/75"
+                        >
+                          {question}
+                        </p>
+                      ))}
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-xs uppercase tracking-[0.16em] text-coffee/55">
+                        Cue notes
+                      </p>
+                      {currentListeningPack.cueNotes.map((note) => (
+                        <p key={note} className="text-sm leading-6 text-coffee/75">
+                          {note}
+                        </p>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => loadListeningLine(currentListeningPack)}
+                        className="rounded-full bg-palm px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#26584b]"
+                      >
+                        Load dictation line
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          loadIntoComposer(
+                            currentListeningPack.shadowingLines[0] ??
+                              currentListeningPack.previewLine
+                          )
+                        }
+                        className="rounded-full bg-ocean px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#1f6f7f]"
+                      >
+                        Load shadowing line
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-sm text-coffee/70">
+                    Link a listening pack to this scenario to seed dictation and shadowing.
+                  </p>
+                )}
               </div>
             </div>
+
+            {currentTurn?.branchOptions.length ? (
+              <div className="mt-4 rounded-[1.5rem] border border-coffee/10 bg-white/70 px-4 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                  Next branch options
+                </p>
+                <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                  {currentTurn.branchOptions.map((branch) => (
+                    <button
+                      key={branch.id}
+                      type="button"
+                      onClick={() => handleBranchAdvance(branch)}
+                      className="rounded-[1.3rem] border border-coffee/10 bg-sand/35 p-4 text-left transition hover:-translate-y-0.5 hover:border-terracotta/30 hover:bg-white"
+                    >
+                      <p className="text-sm font-semibold text-coffee">
+                        {branch.label}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-coffee/75">
+                        {branch.prompt}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             <label className="mt-4 block">
               <span className="mb-2 block text-sm font-medium text-coffee">
@@ -321,7 +746,7 @@ export function SessionPlayground() {
                 }}
                 onPaste={() => setInputSource("paste")}
                 className="min-h-40 w-full rounded-[1.5rem] border border-coffee/15 bg-white/80 px-5 py-4 text-base text-coffee outline-none transition focus:border-terracotta focus:ring-2 focus:ring-terracotta/20"
-                placeholder="Write, paste, or transcribe Spanish here..."
+                placeholder="Write, paste, or record Spanish here..."
               />
             </label>
 
@@ -330,7 +755,7 @@ export function SessionPlayground() {
                 <p>
                   Live note:{" "}
                   {deferredInput.trim()
-                    ? "feedback stays grounded in the learner's meaning and gets saved to the shared backend."
+                    ? "feedback stays tied to this learner, scenario branch, and persisted mistake history."
                     : "enter Spanish or use the microphone to begin."}
                 </p>
                 <p>
@@ -346,7 +771,7 @@ export function SessionPlayground() {
 
               <div className="flex flex-wrap items-center gap-3">
                 <AudioCapture
-                  disabled={isPending || !bootstrap}
+                  disabled={isSubmitting || !bootstrap}
                   onTranscript={handleTranscript}
                   onError={setErrorMessage}
                   onStatusChange={setAudioStatus}
@@ -355,14 +780,14 @@ export function SessionPlayground() {
                   type="button"
                   onClick={handleRunCoach}
                   disabled={
-                    isPending ||
+                    isSubmitting ||
                     !input.trim() ||
                     !selectedLearnerId ||
                     !selectedScenarioId
                   }
                   className="rounded-full bg-terracotta px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#b85a2e] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isPending ? "Analyzing..." : "Run shared coach"}
+                  {isSubmitting ? "Coaching..." : "Run shared coach"}
                 </button>
               </div>
             </div>
@@ -373,63 +798,415 @@ export function SessionPlayground() {
       <section className="panel">
         <div className="mb-6">
           <p className="eyebrow">Current feedback</p>
-          <h2 className="section-title">Correction and follow-up</h2>
+          <h2 className="section-title">Branch-aware coaching</h2>
         </div>
 
         {activeSession ? (
           <div className="space-y-4">
-            <div className="feedback-block">
-              <span>Original</span>
-              <p>{activeSession.userInput}</p>
+            <div className="flex flex-wrap gap-2">
+              <span className="pill bg-palm/10 text-palm">
+                {activeSession.feedback.inputMode}
+              </span>
+              <span className="pill bg-ocean/10 text-ocean">
+                {activeSession.feedback.feedbackMode}
+              </span>
+              <span className="pill bg-coffee/8 text-coffee">
+                {activeSession.feedback.provider}
+              </span>
+              <span className="pill bg-sunrise/15 text-coffee">
+                confidence {confidencePercent(activeSession.feedback.confidenceScore)}
+              </span>
+              {activeSession.scenarioSnapshot.variantLabel ? (
+                <span className="pill bg-sand text-coffee">
+                  {activeSession.scenarioSnapshot.variantLabel}
+                </span>
+              ) : null}
+              {activeSession.scenarioSnapshot.turnLabel ? (
+                <span className="pill bg-terracotta/10 text-terracotta">
+                  {activeSession.scenarioSnapshot.turnLabel}
+                </span>
+              ) : null}
             </div>
+
             <div className="feedback-block">
-              <span>Feedback provider</span>
-              <p>{activeSession.feedback.provider}</p>
+              <span>
+                {activeSession.source === "speech" ? "Transcript" : "Original reply"}
+              </span>
+              <p>{activeSession.feedback.transcriptText}</p>
             </div>
+
+            <div className="feedback-block">
+              <span>Scenario branch</span>
+              <p>{activeSession.scenarioSnapshot.turnPrompt ?? activeSession.scenarioSnapshot.userGoal}</p>
+            </div>
+
             <div className="feedback-block">
               <span>Corrected Spanish</span>
-              <p>{activeSession.feedback.correctedSpanish}</p>
+              <p>{activeSession.feedback.correctedText}</p>
             </div>
+
             <div className="feedback-block">
               <span>More natural version</span>
-              <p>{activeSession.feedback.naturalSpanish}</p>
+              <p>{activeSession.feedback.naturalText}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => loadIntoComposer(activeSession.feedback.correctedText)}
+                  className="rounded-full bg-palm px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#26584b]"
+                >
+                  Use corrected
+                </button>
+                <button
+                  type="button"
+                  onClick={() => loadIntoComposer(activeSession.feedback.naturalText)}
+                  className="rounded-full bg-ocean px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#1f6f7f]"
+                >
+                  Use natural
+                </button>
+              </div>
             </div>
+
             <div className="feedback-block">
-              <span>English explanation</span>
-              <p>{activeSession.feedback.explanation}</p>
+              <span>Minimal explanation</span>
+              <p>{activeSession.feedback.explanationSummary}</p>
             </div>
+
+            <div className="feedback-block">
+              <span>Retry prompt</span>
+              <p>{activeSession.feedback.retryPrompt}</p>
+            </div>
+
+            <div className="feedback-block">
+              <span>Follow-up prompt</span>
+              <p>{activeSession.feedback.followUpPrompt}</p>
+            </div>
+
+            {activeSession.feedback.coupleHandoff ? (
+              <div className="feedback-block">
+                <span>Couple handoff</span>
+                <p>
+                  {activeSession.feedback.coupleHandoff.leadRole} to{" "}
+                  {activeSession.feedback.coupleHandoff.supportRole}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-coffee/75">
+                  {activeSession.feedback.coupleHandoff.handoffPrompt}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-coffee/70">
+                  {activeSession.feedback.coupleHandoff.coachingTip}
+                </p>
+              </div>
+            ) : null}
+
+            {activeSession.feedback.listeningRecommendation ? (
+              <div className="feedback-block">
+                <span>Listening lab link</span>
+                <p>{activeSession.feedback.listeningRecommendation.reason}</p>
+                <p className="mt-2 text-sm leading-6 text-coffee/75">
+                  {activeSession.feedback.listeningRecommendation.previewLine}
+                </p>
+              </div>
+            ) : null}
+
+            <div className="feedback-block">
+              <span>Error focus</span>
+              <div className="mt-2 space-y-3">
+                {activeSession.feedback.errorTags.length > 0 ? (
+                  activeSession.feedback.errorTags.map((tag) => (
+                    <div key={`${tag.code}-${tag.message}`}>
+                      <div className="flex flex-wrap gap-2">
+                        <span
+                          className={`pill ${
+                            tag.severity === "primary"
+                              ? "bg-terracotta/10 text-terracotta"
+                              : "bg-coffee/8 text-coffee"
+                          }`}
+                        >
+                          {formatTag(tag.code)}
+                        </span>
+                        <span className="pill bg-sand text-coffee">
+                          {tag.severity}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-coffee/80">
+                        {tag.message}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p>No major error tags were flagged for this turn.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="feedback-block">
+              <span>Recommended drills</span>
+              <div className="mt-3 space-y-3">
+                {activeSession.feedback.recommendedDrills.map((drill) => (
+                  <div
+                    key={drill.id}
+                    className="rounded-[1.2rem] border border-coffee/10 bg-sand/35 p-4"
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      <span className="pill bg-terracotta/10 text-terracotta">
+                        {formatDrillKind(drill.kind)}
+                      </span>
+                      {drill.focusTagCode ? (
+                        <span className="pill bg-coffee/8 text-coffee">
+                          {formatTag(drill.focusTagCode)}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-3 text-base font-semibold text-coffee">
+                      {drill.title}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-coffee/75">
+                      {drill.reason}
+                    </p>
+                    <div className="mt-3 space-y-2">
+                      {drill.steps.map((step) => (
+                        <p
+                          key={`${drill.id}-${step.label}-${step.prompt}`}
+                          className="text-sm leading-6 text-coffee/75"
+                        >
+                          <span className="font-semibold text-coffee">{step.label}:</span>{" "}
+                          {step.prompt}
+                        </p>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => loadIntoComposer(practicePromptForDrill(drill))}
+                      className="mt-3 rounded-full bg-palm px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#26584b]"
+                    >
+                      Load drill
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="feedback-block">
               <span>Vocabulary notes</span>
-              <p>{activeSession.feedback.vocabularyNotes.join(" • ")}</p>
+              <div className="mt-2 space-y-3">
+                {activeSession.feedback.vocabNotes.map((note) => (
+                  <div key={`${note.term}-${note.gloss}`}>
+                    <p className="font-semibold text-coffee">
+                      {note.term}{" "}
+                      <span className="font-normal text-coffee/60">({note.gloss})</span>
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-coffee/75">{note.note}</p>
+                  </div>
+                ))}
+              </div>
             </div>
+
             <div className="feedback-block">
-              <span>Pronunciation watch-outs</span>
-              <p>
-                {activeSession.feedback.pronunciationNotes.length > 0
-                  ? activeSession.feedback.pronunciationNotes.join(" ")
-                  : "No obvious text-only pronunciation flags yet."}
+              <span>Pronunciation hints</span>
+              <div className="mt-2 space-y-3">
+                {activeSession.feedback.pronunciationHints.map((hint) => (
+                  <div key={`${hint.term}-${hint.hint}`}>
+                    <p className="font-semibold text-coffee">{hint.term}</p>
+                    <p className="mt-1 text-sm leading-6 text-coffee/75">{hint.hint}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="feedback-block">
+              <span>Review recommendation</span>
+              <p>{activeSession.feedback.reviewRecommendation.reason}</p>
+              <p className="mt-2 text-sm leading-6 text-coffee/70">
+                Next step: {activeSession.feedback.reviewRecommendation.nextStep}
               </p>
-            </div>
-            <div className="feedback-block">
-              <span>Follow-up reply</span>
-              <p>{activeSession.feedback.followUpReply}</p>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-1">
-              {activeSession.feedback.errorTags.map((tag) => (
-                <span key={tag} className="pill bg-coffee/8 text-coffee">
-                  {tag}
-                </span>
-              ))}
-              <span className="pill bg-ocean/10 text-ocean">
-                confidence {Math.round(activeSession.feedback.confidenceScore * 100)}%
-              </span>
             </div>
           </div>
         ) : (
           <p className="text-coffee/70">
-            Run the shared coach to generate the first backend-backed practice session.
+            Run the shared coach to generate the first structured practice session.
           </p>
         )}
+      </section>
+
+      <section className="panel lg:col-span-2">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="eyebrow">Review and progress</p>
+            <h2 className="section-title">Richer drills, recurring tags, and listening follow-up</h2>
+          </div>
+          <p className="text-sm text-coffee/65">
+            {review
+              ? "Recurring tags and drill recommendations are derived from persisted learner sessions, not just the current tab."
+              : "Choose a learner to load the review summary."}
+          </p>
+        </div>
+
+        {review ? (
+          <div className="grid gap-4 xl:grid-cols-[0.7fr_1fr_1.3fr]">
+            <div className="rounded-[1.5rem] border border-coffee/10 bg-sand/45 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                Progress snapshot
+              </p>
+              <div className="mt-3 space-y-3 text-sm text-coffee/80">
+                <p>
+                  Sessions stored:{" "}
+                  <span className="font-semibold text-coffee">{review.totalSessions}</span>
+                </p>
+                <p>
+                  Average confidence:{" "}
+                  <span className="font-semibold text-coffee">
+                    {confidencePercent(review.averageConfidence)}
+                  </span>
+                </p>
+                <p>
+                  Last refresh:{" "}
+                  <span className="font-semibold text-coffee">
+                    {prettyDate(review.generatedAt)}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-[1.5rem] border border-coffee/10 bg-white/70 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                Recurring tags
+              </p>
+              <div className="mt-3 space-y-4">
+                {review.recurringTags.length > 0 ? (
+                  review.recurringTags.map((tag) => (
+                    <div key={`${tag.code}-${tag.lastSeenAt}`}>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="pill bg-terracotta/10 text-terracotta">
+                          {formatTag(tag.code)}
+                        </span>
+                        <span className="pill bg-coffee/8 text-coffee">
+                          {tag.count}x
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-coffee/80">
+                        {tag.lastMessage}
+                      </p>
+                      <p className="mt-1 text-xs text-coffee/60">
+                        Last seen in {tag.lastScenarioTitle} on {prettyDate(tag.lastSeenAt)}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-coffee/70">
+                    No recurring tags yet. The learner needs a few saved sessions first.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-[1.5rem] border border-coffee/10 bg-white/70 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                Recommended drills
+              </p>
+              {review.recommendedDrills.length > 0 ? (
+                <div className="mt-3 grid gap-3">
+                  {review.recommendedDrills.map((drill) => (
+                    <div
+                      key={drill.id}
+                      className="rounded-[1.2rem] border border-coffee/10 bg-sand/35 p-4"
+                    >
+                      <div className="flex flex-wrap gap-2">
+                        <span className="pill bg-terracotta/10 text-terracotta">
+                          {formatDrillKind(drill.kind)}
+                        </span>
+                        {drill.focusTagCode ? (
+                          <span className="pill bg-coffee/8 text-coffee">
+                            {formatTag(drill.focusTagCode)}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="mt-3 text-lg font-semibold text-coffee">
+                        {drill.title}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-coffee/80">
+                        {drill.reason}
+                      </p>
+                      <p className="mt-2 text-xs text-coffee/60">
+                        {drill.scenarioTitle ?? "General review"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => loadIntoComposer(practicePromptForDrill(drill))}
+                        className="mt-3 rounded-full bg-palm px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#26584b]"
+                      >
+                        Load drill
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-coffee/70">
+                  The first saved mistakes will turn into richer drill recommendations here.
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <p className="text-coffee/70">No review summary yet for this learner.</p>
+        )}
+
+        {review?.listeningRecommendations.length ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {review.listeningRecommendations.map((item) => (
+              <div
+                key={item.packId}
+                className="rounded-[1.5rem] border border-coffee/10 bg-white/70 p-4"
+              >
+                <p className="text-sm font-semibold text-coffee">{item.packTitle}</p>
+                <p className="mt-2 text-sm leading-6 text-coffee/75">{item.reason}</p>
+                <p className="mt-2 text-sm leading-6 text-coffee/70">
+                  {item.previewLine}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedListeningPackId(item.packId);
+                    loadIntoComposer(item.previewLine);
+                  }}
+                  className="mt-3 rounded-full bg-ocean px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#1f6f7f]"
+                >
+                  Open pack cue
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {review?.recentMistakes.length ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {review.recentMistakes.map((mistake) => (
+              <div
+                key={`${mistake.sessionId}-${mistake.createdAt}`}
+                className="rounded-[1.5rem] border border-coffee/10 bg-sand/35 p-4"
+              >
+                <div className="flex flex-wrap gap-2">
+                  <span className="pill bg-terracotta/10 text-terracotta">
+                    {formatTag(mistake.primaryTag.code)}
+                  </span>
+                  <span className="pill bg-ocean/10 text-ocean">
+                    {mistake.inputMode}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-coffee/80">
+                  {mistake.transcriptText}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-coffee/75">
+                  Correction: {mistake.correctedText}
+                </p>
+                <p className="mt-2 text-xs text-coffee/60">
+                  {mistake.scenarioTitle} • {prettyDate(mistake.createdAt)}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-coffee/75">
+                  Retry: {mistake.retryPrompt}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       <section className="panel lg:col-span-2">
@@ -463,10 +1240,15 @@ export function SessionPlayground() {
                   </span>
                 </div>
                 <h3 className="mt-2 text-lg font-semibold text-coffee">
-                  {resolveScenarioTitle(session.scenarioId, bootstrap?.scenarios)}
+                  {session.scenarioSnapshot.title}
                 </h3>
+                <p className="mt-1 text-xs uppercase tracking-[0.16em] text-coffee/55">
+                  {session.scenarioSnapshot.variantLabel ?? "Default variant"}
+                  {" • "}
+                  {session.scenarioSnapshot.turnLabel ?? "Scenario start"}
+                </p>
                 <p className="mt-2 line-clamp-3 text-sm text-coffee/70">
-                  {session.userInput}
+                  {session.feedback.transcriptText}
                 </p>
                 <p className="mt-3 text-xs text-coffee/55">{prettyDate(session.createdAt)}</p>
               </button>

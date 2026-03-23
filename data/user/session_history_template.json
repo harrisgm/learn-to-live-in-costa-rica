@@ -3,16 +3,126 @@
   "sessions": [
     {
       "id": "session-template-001",
-      "createdAt": "2026-03-21T00:00:00Z",
-      "mode": "tutor",
+      "createdAt": "2026-03-22T00:00:00Z",
+      "mode": "costa-rica",
       "difficulty": "beginner",
-      "scenario": "grocery",
+      "scenarioId": "grocery",
+      "scenarioSnapshot": {
+        "id": "grocery",
+        "title": "Grocery Store",
+        "setting": "Neighborhood market in Costa Rica",
+        "userGoal": "Ask for basic items, prices, and quantities.",
+        "variantId": "market-quick-checkout",
+        "variantLabel": "Quick checkout",
+        "turnId": "grocery-turn-1",
+        "turnLabel": "Open the order",
+        "turnPrompt": "Buenos dias. Que necesita hoy?",
+        "partnerRole": "cashier",
+        "listeningPackId": "grocery-market-fast",
+        "listeningPackTitle": "Grocery Market Fast Speech"
+      },
+      "source": "speech",
       "userInput": "Yo necesito dos tomates y arroz.",
-      "correctedSpanish": "Necesito dos tomates y arroz.",
-      "naturalSpanish": "Quisiera dos tomates y un poco de arroz, por favor.",
-      "explanation": "The sentence works, but beginner feedback removes the unnecessary subject pronoun and improves politeness.",
-      "errorTags": ["register", "subject-pronoun-overuse"],
-      "confidenceScore": 0.45
+      "feedback": {
+        "provider": "local-rules",
+        "inputMode": "speech",
+        "transcriptText": "Yo necesito dos tomates y arroz.",
+        "correctedText": "Yo necesito dos tomates y arroz.",
+        "naturalText": "Quisiera dos tomates y un poco de arroz, por favor.",
+        "explanationSummary": "Your message is understandable. The coach mainly softens the phrasing so it sounds more natural in daily life.",
+        "errorTags": [
+          {
+            "code": "REGISTER_MISMATCH",
+            "severity": "primary",
+            "message": "A slightly softer phrasing will sound more natural in this situation."
+          },
+          {
+            "code": "CLARITY_REPAIR_NEEDED",
+            "severity": "secondary",
+            "message": "Add one more clear detail so a local listener can respond quickly."
+          }
+        ],
+        "retryPrompt": "Try again with one short useful sentence. Make the request softer and more natural for this setting. Model idea: Yo necesito dos tomates y arroz.",
+        "followUpPrompt": "Cuanto cuesta un kilo de tomates?",
+        "vocabNotes": [
+          {
+            "term": "cuanto cuesta",
+            "gloss": "how much does it cost",
+            "note": "Useful for grocery questions and quick follow-up turns."
+          },
+          {
+            "term": "medio kilo",
+            "gloss": "half a kilo",
+            "note": "Useful for grocery questions and quick follow-up turns."
+          }
+        ],
+        "pronunciationHints": [
+          {
+            "term": "arroz",
+            "hint": "Roll the rr lightly and keep both vowels clean."
+          }
+        ],
+        "feedbackMode": "gentle",
+        "learnerFocus": "beginner",
+        "scenarioId": "grocery",
+        "sessionId": "session-template-001",
+        "reviewRecommendation": {
+          "shouldReview": true,
+          "reason": "This turn is worth reviewing because a slightly softer phrasing will sound more natural in this situation.",
+          "nextStep": "Repeat the retry once, then do it again from memory. Try again with one short useful sentence."
+        },
+        "recommendedDrills": [
+          {
+            "id": "session-template-001-retry",
+            "kind": "retry",
+            "title": "Retry Register Mismatch",
+            "reason": "Register mismatch is the clearest next fix for this turn.",
+            "prompt": "Quisiera dos tomates y un poco de arroz, por favor.",
+            "steps": [
+              {
+                "label": "Model",
+                "prompt": "Quisiera dos tomates y un poco de arroz, por favor."
+              },
+              {
+                "label": "Retry",
+                "prompt": "Try again with one short useful sentence."
+              }
+            ],
+            "focusTagCode": "REGISTER_MISMATCH",
+            "scenarioId": "grocery",
+            "scenarioTitle": "Grocery Store",
+            "sourceSessionId": "session-template-001"
+          },
+          {
+            "id": "grocery-market-fast-dictation",
+            "kind": "dictation",
+            "title": "Listening lab: Grocery Market Fast Speech",
+            "reason": "Use this pack to train your ear for checkout language, quantities, and prices.",
+            "prompt": "Claro. Son 1800 colones. Le llevo bolsa?",
+            "steps": [
+              {
+                "label": "Listen for",
+                "prompt": "Me da medio kilo de tomates y un kilo de bananos?"
+              },
+              {
+                "label": "Dictation",
+                "prompt": "Claro. Son 1800 colones. Le llevo bolsa?"
+              }
+            ],
+            "scenarioId": "grocery",
+            "scenarioTitle": "Grocery Store",
+            "sourceSessionId": "session-template-001",
+            "listeningPackId": "grocery-market-fast"
+          }
+        ],
+        "listeningRecommendation": {
+          "packId": "grocery-market-fast",
+          "packTitle": "Grocery Market Fast Speech",
+          "reason": "Use this pack to train your ear for checkout language, quantities, and prices.",
+          "previewLine": "Me da medio kilo de tomates y un kilo de bananos?"
+        },
+        "confidenceScore": 0.58
+      }
     }
   ]
 }

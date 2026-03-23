@@ -3,14 +3,257 @@
   "title": "Grocery Store",
   "setting": "Neighborhood market in Costa Rica",
   "difficulty": "beginner",
-  "userGoal": "Ask for basic items, prices, and quantities.",
-  "mustKnowVocabulary": ["frijoles", "arroz", "cuanto cuesta", "medio kilo"],
+  "userGoal": "Ask for basic items, prices, and quantities without freezing at checkout.",
+  "mustKnowVocabulary": [
+    "frijoles",
+    "arroz",
+    "cuanto cuesta",
+    "medio kilo",
+    "bolsa",
+    "vuelto"
+  ],
   "starterPrompts": [
-    "Necesito comprar arroz y frijoles.",
+    "Buenos dias, necesito arroz y frijoles, por favor.",
     "Cuanto cuesta un kilo de tomates?"
   ],
   "culturalNotes": [
-    "Polite greetings still matter in quick transactions.",
-    "Expect natural-speed answers when prices are listed."
+    "A short greeting helps the exchange feel natural and polite.",
+    "Cashiers may answer with price, weight, and brand details in one breath.",
+    "It is useful to confirm quantity before you pay."
+  ],
+  "partnerRoles": [
+    "shopper",
+    "cashier"
+  ],
+  "likelyMisunderstandings": [
+    "The cashier may answer with brand names and weights faster than expected.",
+    "The learner may skip the quantity and get a follow-up question.",
+    "A polite greeting is expected before the request."
+  ],
+  "variants": [
+    {
+      "id": "market-quick-checkout",
+      "title": "Quick checkout",
+      "setup": "You are at a small neighborhood market after work.",
+      "localReplyStyle": "The cashier answers quickly and expects a short, clear request.",
+      "pressureNote": "The clerk may ask whether you want a bag and whether the amount is enough.",
+      "starterPrompt": "Buenos dias, quiero medio kilo de arroz, por favor."
+    },
+    {
+      "id": "produce-stand",
+      "title": "Produce stand",
+      "setup": "You are choosing fruit and vegetables at an open-air stand.",
+      "localReplyStyle": "The vendor speaks naturally and may bundle prices with a follow-up question.",
+      "pressureNote": "Listen for weight, price, and quantity words close together.",
+      "starterPrompt": "Necesito tomates, bananos y aguacate."
+    },
+    {
+      "id": "corner-store-restock",
+      "title": "Corner store restock",
+      "setup": "You are buying a few basics for the house and want to stay within budget.",
+      "localReplyStyle": "The clerk may suggest a cheaper size or ask if you need anything else.",
+      "pressureNote": "Expect one fast question about brand or bagging before you pay.",
+      "starterPrompt": "Cuanto cuesta el arroz mas pequeno?"
+    }
+  ],
+  "turns": [
+    {
+      "id": "grocery-turn-1",
+      "title": "Open the order",
+      "learnerGoal": "Say hello and ask for the item with a quantity.",
+      "localRole": "cashier",
+      "prompt": "Buenos dias. Que necesita hoy?",
+      "listenFor": [
+        "greeting",
+        "quantity",
+        "item",
+        "price"
+      ],
+      "repairCue": "If the learner only names the item, ask for a quantity or amount.",
+      "branchOptions": [
+        {
+          "id": "grocery-turn-1-qty",
+          "label": "Add quantity",
+          "prompt": "Necesito medio kilo de arroz, por favor.",
+          "nextTurnId": "grocery-turn-2"
+        },
+        {
+          "id": "grocery-turn-1-price",
+          "label": "Ask the price",
+          "prompt": "Cuanto cuesta un kilo de tomates?",
+          "nextTurnId": "grocery-turn-2"
+        }
+      ],
+      "recommendedDrillIds": [
+        "grocery-retry-quantity",
+        "grocery-shadow-checkout"
+      ],
+      "listeningPackId": "grocery-market-fast"
+    },
+    {
+      "id": "grocery-turn-2",
+      "title": "Confirm the amount",
+      "learnerGoal": "Understand the price and confirm whether the amount is enough.",
+      "localRole": "cashier",
+      "prompt": "Claro. Son 1800 colones. Le parece bien?",
+      "listenFor": [
+        "price",
+        "confirmation",
+        "agreement",
+        "bag"
+      ],
+      "repairCue": "If the learner misses the number, repeat just the price more slowly.",
+      "branchOptions": [
+        {
+          "id": "grocery-turn-2-confirm",
+          "label": "Confirm and continue",
+          "prompt": "Si, esta bien. Tambien necesito una bolsa.",
+          "nextTurnId": "grocery-turn-3"
+        },
+        {
+          "id": "grocery-turn-2-adjust",
+          "label": "Adjust the quantity",
+          "prompt": "Entonces mejor medio kilo nada mas.",
+          "nextTurnId": "grocery-turn-3"
+        }
+      ],
+      "recommendedDrillIds": [
+        "grocery-contrast-price",
+        "grocery-dictation-price"
+      ],
+      "listeningPackId": "grocery-market-fast"
+    },
+    {
+      "id": "grocery-turn-3",
+      "title": "Close the purchase",
+      "learnerGoal": "Finish the transaction with one polite final phrase.",
+      "localRole": "cashier",
+      "prompt": "Perfecto. Le llevo una bolsa mas?",
+      "listenFor": [
+        "bag",
+        "final question",
+        "closing",
+        "thanks"
+      ],
+      "repairCue": "If the learner only says thanks, ask them to add one final detail like the bag or the total.",
+      "branchOptions": [
+        {
+          "id": "grocery-turn-3-bag",
+          "label": "Ask for a bag",
+          "prompt": "Si, por favor. Y me da el vuelto, por favor.",
+          "nextTurnId": "grocery-turn-end"
+        },
+        {
+          "id": "grocery-turn-3-thanks",
+          "label": "Close politely",
+          "prompt": "No, gracias. Eso es todo.",
+          "nextTurnId": "grocery-turn-end"
+        }
+      ],
+      "recommendedDrillIds": [
+        "grocery-partner-handoff"
+      ],
+      "listeningPackId": "grocery-market-fast"
+    }
+  ],
+  "followUpDrills": [
+    {
+      "id": "grocery-retry-quantity",
+      "kind": "retry",
+      "title": "Add the quantity",
+      "goal": "Practice saying item + amount + please in one short line.",
+      "prompt": "Necesito medio kilo de arroz y frijoles, por favor.",
+      "steps": [
+        "Say the item.",
+        "Add the quantity.",
+        "End with por favor."
+      ],
+      "focusTagCodes": [
+        "CLARITY_REPAIR_NEEDED",
+        "LITERAL_TRANSLATION"
+      ]
+    },
+    {
+      "id": "grocery-contrast-price",
+      "kind": "contrast",
+      "title": "Ask price two ways",
+      "goal": "Switch between a direct price question and a softer follow-up.",
+      "prompt": "Cuanto cuesta un kilo de tomates? / Me dice el precio, por favor?",
+      "steps": [
+        "Say the direct version.",
+        "Say the softer version.",
+        "Keep the tone polite and brief."
+      ],
+      "focusTagCodes": [
+        "REGISTER_MISMATCH"
+      ]
+    },
+    {
+      "id": "grocery-shadow-checkout",
+      "kind": "shadowing",
+      "title": "Shadow a checkout line",
+      "goal": "Copy a realistic cashier line at natural speed.",
+      "prompt": "Claro. Son 1800 colones. Le parece bien?",
+      "steps": [
+        "Listen once.",
+        "Repeat with the same rhythm.",
+        "Repeat again a little faster."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR"
+      ],
+      "listeningPackId": "grocery-market-fast"
+    },
+    {
+      "id": "grocery-dictation-price",
+      "kind": "dictation",
+      "title": "Dictate the price line",
+      "goal": "Write the number you hear and say it back clearly.",
+      "prompt": "Son 1800 colones y si quiere le doy bolsa.",
+      "steps": [
+        "Hear the full line.",
+        "Write the price.",
+        "Read it back slowly."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR",
+        "CLARITY_REPAIR_NEEDED"
+      ],
+      "listeningPackId": "grocery-market-fast"
+    },
+    {
+      "id": "grocery-partner-handoff",
+      "kind": "partner-handoff",
+      "title": "Split the checkout",
+      "goal": "Let one partner ask for the item and the other confirm the price or bag.",
+      "prompt": "Partner A asks for the item. Partner B confirms the price and bagging.",
+      "steps": [
+        "Partner A greets and orders.",
+        "Partner B confirms the total.",
+        "Switch roles and repeat."
+      ],
+      "focusTagCodes": [
+        "WORD_ORDER"
+      ]
+    }
+  ],
+  "coupleSupport": {
+    "sharedGoal": "One partner asks, the other confirms quantity or price before paying.",
+    "partnerRoles": [
+      "Partner A asks for the item and quantity",
+      "Partner B confirms the total or asks for a bag"
+    ],
+    "handoffPrompts": [
+      "Ahora tu pareja pregunta por el precio.",
+      "Tu turno: confirma la cantidad y pide la bolsa."
+    ],
+    "keepBothInvolvedTip": "Keep each reply to one useful detail so neither learner disappears into a long monologue."
+  },
+  "listeningCues": [
+    {
+      "packId": "grocery-market-fast",
+      "focus": "natural-speed checkout language",
+      "previewLine": "Me da medio kilo de tomates y un kilo de bananos?"
+    }
   ]
 }

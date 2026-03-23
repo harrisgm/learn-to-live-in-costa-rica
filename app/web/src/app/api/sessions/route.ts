@@ -15,6 +15,11 @@ export async function GET(request: Request) {
     );
   }
 
-  const sessions = await getSessionStore().listSessions(learnerId);
-  return NextResponse.json({ sessions });
+  const store = getSessionStore();
+  const [sessions, review] = await Promise.all([
+    store.listSessions(learnerId),
+    store.getLearnerReview(learnerId)
+  ]);
+
+  return NextResponse.json({ sessions, review });
 }

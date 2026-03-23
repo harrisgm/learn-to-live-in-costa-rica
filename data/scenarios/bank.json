@@ -1,16 +1,260 @@
 {
   "id": "bank",
   "title": "Bank Visit",
-  "setting": "Bank counter or customer service desk",
+  "setting": "Bank counter or customer service desk in Costa Rica",
   "difficulty": "intermediate",
-  "userGoal": "Ask for account, transfer, and document help.",
-  "mustKnowVocabulary": ["cuenta", "transferencia", "estado de cuenta", "documento"],
+  "userGoal": "Ask for account, transfer, and document help in a formal, clear way.",
+  "mustKnowVocabulary": [
+    "cuenta",
+    "transferencia",
+    "estado de cuenta",
+    "documento",
+    "firma",
+    "comision"
+  ],
   "starterPrompts": [
     "Necesito ayuda con una transferencia.",
     "Que documentos necesito para abrir una cuenta?"
   ],
   "culturalNotes": [
-    "This scenario benefits from repair phrases and clarification requests.",
-    "Formal language may be more helpful than casual phrasing."
+    "Bank staff often appreciate formal phrasing and one question at a time.",
+    "Numbers, fees, and document names can come fast, so slow listening matters.",
+    "It helps to confirm the next step before leaving the counter."
+  ],
+  "partnerRoles": [
+    "customer",
+    "bank clerk"
+  ],
+  "likelyMisunderstandings": [
+    "The learner may mix up account type, transfer amount, and fee details.",
+    "The clerk may use formal phrasing or document vocabulary quickly.",
+    "The learner may not ask for the next step after hearing the requirements."
+  ],
+  "variants": [
+    {
+      "id": "account-opening",
+      "title": "Account opening",
+      "setup": "You are at the service desk asking what you need to open an account.",
+      "localReplyStyle": "The clerk gives a formal answer with document names and one next step.",
+      "pressureNote": "Listen for ID, proof of address, and any form you need to sign.",
+      "starterPrompt": "Que documentos necesito para abrir una cuenta?"
+    },
+    {
+      "id": "transfer-issue",
+      "title": "Transfer issue",
+      "setup": "You need help with a transfer that did not go through as expected.",
+      "localReplyStyle": "The clerk asks for the amount, destination, and the date of the transfer.",
+      "pressureNote": "The answer may include a fee or a system check.",
+      "starterPrompt": "No me aparece una transferencia de ayer."
+    },
+    {
+      "id": "card-or-statement",
+      "title": "Card or statement help",
+      "setup": "You need a statement or help with a card problem before a trip.",
+      "localReplyStyle": "The staff member keeps the reply formal and practical.",
+      "pressureNote": "Expect one detail about printing, signing, or waiting in line.",
+      "starterPrompt": "Necesito un estado de cuenta y una carta."
+    }
+  ],
+  "turns": [
+    {
+      "id": "bank-turn-1",
+      "title": "State the request",
+      "learnerGoal": "Ask for the service you need with a formal opening.",
+      "localRole": "bank clerk",
+      "prompt": "Buenos dias. En que le puedo ayudar?",
+      "listenFor": [
+        "service",
+        "documents",
+        "account",
+        "transfer"
+      ],
+      "repairCue": "If the learner is vague, narrow it to the account, transfer, or document issue.",
+      "branchOptions": [
+        {
+          "id": "bank-turn-1-account",
+          "label": "Open an account",
+          "prompt": "Necesito abrir una cuenta, por favor.",
+          "nextTurnId": "bank-turn-2"
+        },
+        {
+          "id": "bank-turn-1-transfer",
+          "label": "Ask about a transfer",
+          "prompt": "Necesito ayuda con una transferencia de ayer.",
+          "nextTurnId": "bank-turn-2"
+        }
+      ],
+      "recommendedDrillIds": [
+        "bank-retry-formal",
+        "bank-dictation-documents"
+      ],
+      "listeningPackId": "bank-service-fast"
+    },
+    {
+      "id": "bank-turn-2",
+      "title": "Clarify the requirement",
+      "learnerGoal": "Ask what documents or information are required.",
+      "localRole": "bank clerk",
+      "prompt": "Necesito su documento, una constancia de domicilio y una firma aqui.",
+      "listenFor": [
+        "document",
+        "address",
+        "signature",
+        "requirement"
+      ],
+      "repairCue": "If the learner misses one document, repeat just that item.",
+      "branchOptions": [
+        {
+          "id": "bank-turn-2-docs",
+          "label": "Repeat the documents",
+          "prompt": "Entonces necesito documento y constancia de domicilio, verdad?",
+          "nextTurnId": "bank-turn-3"
+        },
+        {
+          "id": "bank-turn-2-fee",
+          "label": "Ask about fees",
+          "prompt": "Hay alguna comision por este tramite?",
+          "nextTurnId": "bank-turn-3"
+        }
+      ],
+      "recommendedDrillIds": [
+        "bank-contrast-docs",
+        "bank-shadow-formal"
+      ],
+      "listeningPackId": "bank-service-fast"
+    },
+    {
+      "id": "bank-turn-3",
+      "title": "Confirm the next step",
+      "learnerGoal": "Leave with one clear next action or fee confirmation.",
+      "localRole": "bank clerk",
+      "prompt": "Le reviso los datos y luego le llamamos para finalizar.",
+      "listenFor": [
+        "next step",
+        "call",
+        "finalize",
+        "wait"
+      ],
+      "repairCue": "If the learner only says yes, ask them to repeat the next step in their own words.",
+      "branchOptions": [
+        {
+          "id": "bank-turn-3-next-step",
+          "label": "Confirm next step",
+          "prompt": "Perfecto. Entonces espero la llamada para finalizar.",
+          "nextTurnId": "bank-turn-end"
+        },
+        {
+          "id": "bank-turn-3-question",
+          "label": "Ask one more question",
+          "prompt": "Y la comision queda igual o cambia?",
+          "nextTurnId": "bank-turn-end"
+        }
+      ],
+      "recommendedDrillIds": [
+        "bank-partner-handoff"
+      ],
+      "listeningPackId": "bank-service-fast"
+    }
+  ],
+  "followUpDrills": [
+    {
+      "id": "bank-retry-formal",
+      "kind": "retry",
+      "title": "Ask formally for help",
+      "goal": "Practice a polite bank opening line.",
+      "prompt": "Buenos dias, necesito ayuda con una transferencia.",
+      "steps": [
+        "Open with a greeting.",
+        "State the request.",
+        "Keep the tone formal."
+      ],
+      "focusTagCodes": [
+        "REGISTER_MISMATCH",
+        "LITERAL_TRANSLATION"
+      ]
+    },
+    {
+      "id": "bank-contrast-docs",
+      "kind": "contrast",
+      "title": "Compare documents and next steps",
+      "goal": "Practice asking for required papers and the next action.",
+      "prompt": "Que documentos necesito? / Cual es el siguiente paso?",
+      "steps": [
+        "Ask for documents.",
+        "Ask for the next step.",
+        "Repeat the answer in your own words."
+      ],
+      "focusTagCodes": [
+        "WORD_ORDER",
+        "CLARITY_REPAIR_NEEDED"
+      ]
+    },
+    {
+      "id": "bank-shadow-formal",
+      "kind": "shadowing",
+      "title": "Shadow the formal line",
+      "goal": "Repeat a formal clerk reply at natural speed.",
+      "prompt": "Necesito su documento, una constancia de domicilio y una firma aqui.",
+      "steps": [
+        "Listen once.",
+        "Repeat the document list.",
+        "Repeat the full line."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR"
+      ],
+      "listeningPackId": "bank-service-fast"
+    },
+    {
+      "id": "bank-dictation-documents",
+      "kind": "dictation",
+      "title": "Dictate the document list",
+      "goal": "Write the required papers you hear in order.",
+      "prompt": "Necesito su documento, una constancia de domicilio y una firma aqui.",
+      "steps": [
+        "Write the first document.",
+        "Write the second document.",
+        "Write the action to finish."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR",
+        "CLARITY_REPAIR_NEEDED"
+      ],
+      "listeningPackId": "bank-service-fast"
+    },
+    {
+      "id": "bank-partner-handoff",
+      "kind": "partner-handoff",
+      "title": "Split forms and fees",
+      "goal": "Let one partner handle documents and the other handle fees or timing.",
+      "prompt": "Partner A asks about documents. Partner B asks about the fee or next step.",
+      "steps": [
+        "Partner A asks for the requirements.",
+        "Partner B asks about fees.",
+        "Switch roles and repeat."
+      ],
+      "focusTagCodes": [
+        "WORD_ORDER"
+      ]
+    }
+  ],
+  "coupleSupport": {
+    "sharedGoal": "One partner keeps track of documents while the other keeps track of fees and timing.",
+    "partnerRoles": [
+      "Partner A asks about documents and signatures",
+      "Partner B asks about fees and the next step"
+    ],
+    "handoffPrompts": [
+      "Ahora tu pareja pregunta por los documentos.",
+      "Tu turno: pregunta por la comision o el siguiente paso."
+    ],
+    "keepBothInvolvedTip": "Bank language is formal, so keep the turns short and give each partner one specific job."
+  },
+  "listeningCues": [
+    {
+      "packId": "bank-service-fast",
+      "focus": "formal service language and document lists",
+      "previewLine": "Necesito su documento, una constancia de domicilio y una firma aqui."
+    }
   ]
 }

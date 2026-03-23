@@ -144,7 +144,9 @@ This repo now includes a lightweight stewardship layer for long-running Codex an
 
 - [docs/stewardship/STEWARD_THREAD_HANDBOOK.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/STEWARD_THREAD_HANDBOOK.md): steward-thread role, source-of-truth order, handoff timing, and delegation expectations
 - [docs/stewardship/HANDOFF_CHECKLIST.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/stewardship/HANDOFF_CHECKLIST.md): closeout and handoff checklist for milestone boundaries
-- [docs/chatgpt/README.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/README.md): source index for `00_MASTER_PLAN`, `08_PROGRESS_TRACKER`, and public-vs-private ChatGPT project files
+- [docs/chatgpt/README.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/README.md): source index and front door for the ChatGPT project operating pack
+- [docs/chatgpt/LANE_MAP.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/LANE_MAP.md): recommended ChatGPT lane structure, ownership boundaries, and lean-mode option
+- [docs/chatgpt/HANDOFF_PROTOCOL.md](/Users/guyharris/learn-to-live-in-costa-rica/docs/chatgpt/HANDOFF_PROTOCOL.md): packet format and rollover rules for ChatGPT threads and Codex handoffs
 
 ## Public vs Private Data Rules
 

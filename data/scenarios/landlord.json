@@ -3,14 +3,258 @@
   "title": "Landlord Conversation",
   "setting": "Rental or housing discussion",
   "difficulty": "beginner+",
-  "userGoal": "Ask about rent, repairs, and move-in details.",
-  "mustKnowVocabulary": ["alquiler", "deposito", "arreglar", "incluido"],
+  "userGoal": "Ask about rent, utilities, repairs, and move-in details clearly.",
+  "mustKnowVocabulary": [
+    "alquiler",
+    "deposito",
+    "arreglar",
+    "incluido",
+    "servicios",
+    "contrato"
+  ],
   "starterPrompts": [
     "El alquiler incluye agua o internet?",
     "Cuando podemos ver la propiedad?"
   ],
   "culturalNotes": [
-    "Housing conversations may become fast when discussing practical details.",
-    "Clarifying included utilities is a high-value skill."
+    "Housing conversations may move quickly once money and timing come up.",
+    "It helps to ask about services, deposit, and repairs one detail at a time.",
+    "Formal phrasing is usually safer than slang in rental conversations."
+  ],
+  "partnerRoles": [
+    "tenant",
+    "landlord"
+  ],
+  "likelyMisunderstandings": [
+    "The learner may confuse rent, deposit, and monthly services.",
+    "The landlord may mention contract details or move-in dates quickly.",
+    "The learner may ask about repairs without first confirming who pays."
+  ],
+  "variants": [
+    {
+      "id": "apartment-tour",
+      "title": "Apartment tour",
+      "setup": "You are standing in the apartment during a short walkthrough.",
+      "localReplyStyle": "The owner answers directly and may switch between rent, utilities, and timing.",
+      "pressureNote": "Listen for numbers, dates, and included services in the same reply.",
+      "starterPrompt": "El alquiler incluye agua y internet?"
+    },
+    {
+      "id": "whatsapp-rental-question",
+      "title": "WhatsApp rental question",
+      "setup": "You are sending a practical question by message before visiting the property.",
+      "localReplyStyle": "The landlord keeps the reply short and expects one clear question at a time.",
+      "pressureNote": "You may need to repeat the key point if the answer comes back too fast.",
+      "starterPrompt": "Nos puede confirmar el deposito y la fecha de entrada?"
+    },
+    {
+      "id": "repair-follow-up",
+      "title": "Repair follow-up",
+      "setup": "You already rent the place and want to ask about a small fix.",
+      "localReplyStyle": "The owner may ask whether the issue is urgent or if someone can visit today.",
+      "pressureNote": "Focus on the repair word, the room, and the timing.",
+      "starterPrompt": "Hay un problema con la ducha en el bano."
+    }
+  ],
+  "turns": [
+    {
+      "id": "landlord-turn-1",
+      "title": "Open the rental question",
+      "learnerGoal": "Ask about rent, deposit, or the first available date.",
+      "localRole": "landlord",
+      "prompt": "Buenos dias. Que duda tiene sobre la propiedad?",
+      "listenFor": [
+        "rent",
+        "deposit",
+        "date",
+        "availability"
+      ],
+      "repairCue": "If the learner is vague, narrow it to one practical detail like rent or move-in date.",
+      "branchOptions": [
+        {
+          "id": "landlord-turn-1-rent",
+          "label": "Ask about rent",
+          "prompt": "Cuanto es el alquiler mensual?",
+          "nextTurnId": "landlord-turn-2"
+        },
+        {
+          "id": "landlord-turn-1-date",
+          "label": "Ask about move-in",
+          "prompt": "Cuando podemos entrar a la propiedad?",
+          "nextTurnId": "landlord-turn-2"
+        }
+      ],
+      "recommendedDrillIds": [
+        "landlord-retry-rent",
+        "landlord-shadow-tour"
+      ],
+      "listeningPackId": "landlord-housing-fast"
+    },
+    {
+      "id": "landlord-turn-2",
+      "title": "Clarify what is included",
+      "learnerGoal": "Check whether utilities, internet, or maintenance are included.",
+      "localRole": "landlord",
+      "prompt": "El deposito es de un mes y el agua si esta incluida.",
+      "listenFor": [
+        "included",
+        "deposit",
+        "water",
+        "internet"
+      ],
+      "repairCue": "If the learner misses the included services, repeat only that part.",
+      "branchOptions": [
+        {
+          "id": "landlord-turn-2-water",
+          "label": "Confirm water",
+          "prompt": "Entonces el agua esta incluida, verdad?",
+          "nextTurnId": "landlord-turn-3"
+        },
+        {
+          "id": "landlord-turn-2-internet",
+          "label": "Ask about internet",
+          "prompt": "Y el internet tambien esta incluido?",
+          "nextTurnId": "landlord-turn-3"
+        }
+      ],
+      "recommendedDrillIds": [
+        "landlord-contrast-included",
+        "landlord-dictation-deposit"
+      ],
+      "listeningPackId": "landlord-housing-fast"
+    },
+    {
+      "id": "landlord-turn-3",
+      "title": "Ask for next steps",
+      "learnerGoal": "Confirm the next step for visit, contract, or repair.",
+      "localRole": "landlord",
+      "prompt": "Le mando el contrato y coordinamos la visita para manana.",
+      "listenFor": [
+        "contract",
+        "visit",
+        "tomorrow",
+        "next step"
+      ],
+      "repairCue": "If the learner only says yes, ask them to repeat the next step or date.",
+      "branchOptions": [
+        {
+          "id": "landlord-turn-3-visit",
+          "label": "Set the visit",
+          "prompt": "Perfecto. Entonces coordinamos la visita para manana.",
+          "nextTurnId": "landlord-turn-end"
+        },
+        {
+          "id": "landlord-turn-3-contract",
+          "label": "Ask for the contract",
+          "prompt": "Si, por favor. Me manda el contrato por mensaje?",
+          "nextTurnId": "landlord-turn-end"
+        }
+      ],
+      "recommendedDrillIds": [
+        "landlord-partner-handoff"
+      ],
+      "listeningPackId": "landlord-housing-fast"
+    }
+  ],
+  "followUpDrills": [
+    {
+      "id": "landlord-retry-rent",
+      "kind": "retry",
+      "title": "Say the rent question cleanly",
+      "goal": "Ask the monthly rent in one direct sentence.",
+      "prompt": "Cuanto es el alquiler mensual?",
+      "steps": [
+        "Say the monthly rent.",
+        "Add one polite marker.",
+        "Keep it short."
+      ],
+      "focusTagCodes": [
+        "VOCAB_CHOICE",
+        "REGISTER_MISMATCH"
+      ]
+    },
+    {
+      "id": "landlord-contrast-included",
+      "kind": "contrast",
+      "title": "Separate included from extra",
+      "goal": "Practice asking what is included and what is extra.",
+      "prompt": "Que incluye el alquiler? / Que no incluye?",
+      "steps": [
+        "Ask what is included.",
+        "Ask what is not included.",
+        "Compare the two answers."
+      ],
+      "focusTagCodes": [
+        "WORD_ORDER",
+        "PREPOSITION"
+      ]
+    },
+    {
+      "id": "landlord-shadow-tour",
+      "kind": "shadowing",
+      "title": "Shadow a tour answer",
+      "goal": "Repeat a realistic landlord reply at natural speed.",
+      "prompt": "El deposito es de un mes y el agua si esta incluida.",
+      "steps": [
+        "Listen once.",
+        "Repeat the key facts.",
+        "Repeat again with the same rhythm."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR"
+      ],
+      "listeningPackId": "landlord-housing-fast"
+    },
+    {
+      "id": "landlord-dictation-deposit",
+      "kind": "dictation",
+      "title": "Dictate the deposit line",
+      "goal": "Write the deposit and date details you hear.",
+      "prompt": "El deposito es de un mes y la entrada puede ser manana.",
+      "steps": [
+        "Write the deposit detail.",
+        "Write the move-in detail.",
+        "Say it back slowly."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR",
+        "CLARITY_REPAIR_NEEDED"
+      ],
+      "listeningPackId": "landlord-housing-fast"
+    },
+    {
+      "id": "landlord-partner-handoff",
+      "kind": "partner-handoff",
+      "title": "Split rent and utilities",
+      "goal": "Let one partner ask about rent while the other asks about included services.",
+      "prompt": "Partner A asks about rent. Partner B asks about water, internet, or repairs.",
+      "steps": [
+        "Partner A asks the rent question.",
+        "Partner B asks what is included.",
+        "Switch roles and repeat."
+      ],
+      "focusTagCodes": [
+        "WORD_ORDER"
+      ]
+    }
+  ],
+  "coupleSupport": {
+    "sharedGoal": "One partner handles money and timing while the other handles included services and repairs.",
+    "partnerRoles": [
+      "Partner A asks about rent and deposit",
+      "Partner B asks about water, internet, and repairs"
+    ],
+    "handoffPrompts": [
+      "Ahora tu pareja pregunta por el deposito.",
+      "Tu turno: confirma si el agua y el internet estan incluidos."
+    ],
+    "keepBothInvolvedTip": "Split money, timing, and repair questions between both learners so the stronger speaker does not carry the whole exchange."
+  },
+  "listeningCues": [
+    {
+      "packId": "landlord-housing-fast",
+      "focus": "rental terms and move-in timing",
+      "previewLine": "El deposito es de un mes y podemos coordinar la entrada para manana."
+    }
   ]
 }

@@ -16,9 +16,16 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["tag", "description", "recurrenceCount"],
+        "required": [
+          "code",
+          "description",
+          "recurrenceCount",
+          "lastSeen",
+          "lastScenarioId",
+          "lastScenarioTitle"
+        ],
         "properties": {
-          "tag": {
+          "code": {
             "type": "string"
           },
           "description": {
@@ -34,6 +41,15 @@
           "lastSeen": {
             "type": "string",
             "format": "date-time"
+          },
+          "lastScenarioId": {
+            "type": "string"
+          },
+          "lastScenarioTitle": {
+            "type": "string"
+          },
+          "sampleCorrection": {
+            "type": "string"
           }
         },
         "additionalProperties": false

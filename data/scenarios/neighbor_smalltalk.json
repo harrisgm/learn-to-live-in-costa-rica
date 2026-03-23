@@ -1,16 +1,259 @@
 {
   "id": "neighbor-smalltalk",
   "title": "Neighbor Small Talk",
-  "setting": "Friendly conversation with neighbors",
+  "setting": "Friendly conversation with neighbors in Costa Rica",
   "difficulty": "beginner+",
-  "userGoal": "Build rapport and handle short everyday exchanges.",
-  "mustKnowVocabulary": ["mucho gusto", "de donde son", "por aqui", "que dicha"],
+  "userGoal": "Build rapport and handle short everyday exchanges without sounding stiff.",
+  "mustKnowVocabulary": [
+    "mucho gusto",
+    "de donde son",
+    "por aqui",
+    "que dicha",
+    "barrio",
+    "recomendacion"
+  ],
   "starterPrompts": [
     "Somos nuevos por aqui.",
     "Estamos aprendiendo espanol porque queremos vivir aqui."
   ],
   "culturalNotes": [
     "Warmth matters as much as grammar in social exchanges.",
-    "Small talk is a useful bridge into deeper local relationships."
+    "Short follow-up questions usually feel more natural than long explanations.",
+    "It helps when both partners take turns and ask something back."
+  ],
+  "partnerRoles": [
+    "neighbor",
+    "new resident"
+  ],
+  "likelyMisunderstandings": [
+    "The learner may sound too formal for a casual neighborhood chat.",
+    "The learner may talk too long and forget to ask a return question.",
+    "The neighbor may mention the area, weather, or family quickly in passing."
+  ],
+  "variants": [
+    {
+      "id": "front-gate-hello",
+      "title": "Front gate hello",
+      "setup": "You meet a neighbor by the gate while carrying groceries.",
+      "localReplyStyle": "The neighbor is friendly and expects a warm greeting first.",
+      "pressureNote": "A simple return question is enough to keep the conversation going.",
+      "starterPrompt": "Mucho gusto, somos nuevos por aqui."
+    },
+    {
+      "id": "walk-and-chat",
+      "title": "Walk and chat",
+      "setup": "You are chatting briefly while walking down the street.",
+      "localReplyStyle": "The neighbor may comment on the weather, the barrio, or local routines.",
+      "pressureNote": "Listen for small local references that you can echo back.",
+      "starterPrompt": "Nos gusta mucho este barrio."
+    },
+    {
+      "id": "coffee-invitation",
+      "title": "Coffee invitation",
+      "setup": "A neighbor is inviting you to stop by for coffee or a quick chat.",
+      "localReplyStyle": "The neighbor sounds warm and open, with one invitation and one follow-up question.",
+      "pressureNote": "A short and friendly answer is better than a long explanation.",
+      "starterPrompt": "Que dicha. Gracias por la invitacion."
+    }
+  ],
+  "turns": [
+    {
+      "id": "neighbor-turn-1",
+      "title": "Open warmly",
+      "learnerGoal": "Say hello and mention that you are new to the area.",
+      "localRole": "neighbor",
+      "prompt": "Buenos dias. Ustedes son nuevos por aqui?",
+      "listenFor": [
+        "hello",
+        "new",
+        "area",
+        "where from"
+      ],
+      "repairCue": "If the learner sounds formal, coach them toward a warm, relaxed greeting.",
+      "branchOptions": [
+        {
+          "id": "neighbor-turn-1-new",
+          "label": "Say you are new",
+          "prompt": "Si, somos nuevos por aqui.",
+          "nextTurnId": "neighbor-turn-2"
+        },
+        {
+          "id": "neighbor-turn-1-where-from",
+          "label": "Say where you are from",
+          "prompt": "Si, somos de Estados Unidos y estamos aprendiendo espanol.",
+          "nextTurnId": "neighbor-turn-2"
+        }
+      ],
+      "recommendedDrillIds": [
+        "neighbor-retry-greeting",
+        "neighbor-shadow-friendly"
+      ],
+      "listeningPackId": "neighbor-smalltalk-evening"
+    },
+    {
+      "id": "neighbor-turn-2",
+      "title": "Ask a return question",
+      "learnerGoal": "Keep the exchange going by asking one friendly question back.",
+      "localRole": "neighbor",
+      "prompt": "Que bueno. De donde son ustedes?",
+      "listenFor": [
+        "where from",
+        "country",
+        "family",
+        "how long"
+      ],
+      "repairCue": "If the learner only answers and stops, ask them to add one question back.",
+      "branchOptions": [
+        {
+          "id": "neighbor-turn-2-country",
+          "label": "Answer and ask back",
+          "prompt": "Somos de Estados Unidos. Y ustedes, viven aqui hace mucho?",
+          "nextTurnId": "neighbor-turn-3"
+        },
+        {
+          "id": "neighbor-turn-2-area",
+          "label": "Ask about the area",
+          "prompt": "Nos gusta mucho el barrio. Tiene una soda cerca?",
+          "nextTurnId": "neighbor-turn-3"
+        }
+      ],
+      "recommendedDrillIds": [
+        "neighbor-contrast-friendly",
+        "neighbor-dictation-smalltalk"
+      ],
+      "listeningPackId": "neighbor-smalltalk-evening"
+    },
+    {
+      "id": "neighbor-turn-3",
+      "title": "Close naturally",
+      "learnerGoal": "End the chat with warmth and an invitation or thanks.",
+      "localRole": "neighbor",
+      "prompt": "Que dicha. Cualquier cosa me avisan.",
+      "listenFor": [
+        "warm closing",
+        "help",
+        "later",
+        "thanks"
+      ],
+      "repairCue": "If the learner only says goodbye, ask them to add thanks or a simple invitation.",
+      "branchOptions": [
+        {
+          "id": "neighbor-turn-3-thanks",
+          "label": "Thank them",
+          "prompt": "Muchas gracias. Que gusto conocerlos.",
+          "nextTurnId": "neighbor-turn-end"
+        },
+        {
+          "id": "neighbor-turn-3-invite",
+          "label": "Return the invitation",
+          "prompt": "Gracias. Tambien pueden pasar a tomar cafe un dia.",
+          "nextTurnId": "neighbor-turn-end"
+        }
+      ],
+      "recommendedDrillIds": [
+        "neighbor-partner-handoff"
+      ],
+      "listeningPackId": "neighbor-smalltalk-evening"
+    }
+  ],
+  "followUpDrills": [
+    {
+      "id": "neighbor-retry-greeting",
+      "kind": "retry",
+      "title": "Say hello warmly",
+      "goal": "Practice a short, friendly neighborhood greeting.",
+      "prompt": "Mucho gusto, somos nuevos por aqui.",
+      "steps": [
+        "Say hello.",
+        "Say that you are new.",
+        "Keep it warm and short."
+      ],
+      "focusTagCodes": [
+        "REGISTER_MISMATCH",
+        "CLARITY_REPAIR_NEEDED"
+      ]
+    },
+    {
+      "id": "neighbor-contrast-friendly",
+      "kind": "contrast",
+      "title": "Compare casual and stiff phrasing",
+      "goal": "Practice a friendlier version of the same introduction.",
+      "prompt": "Mucho gusto, somos nuevos por aqui. / Hola, que gusto saludarlos.",
+      "steps": [
+        "Say the more direct version.",
+        "Say the friendlier version.",
+        "Notice which one feels more natural."
+      ],
+      "focusTagCodes": [
+        "REGISTER_MISMATCH"
+      ]
+    },
+    {
+      "id": "neighbor-shadow-friendly",
+      "kind": "shadowing",
+      "title": "Shadow a friendly neighbor line",
+      "goal": "Repeat a warm local reply at natural speed.",
+      "prompt": "Que dicha. Cualquier cosa me avisan.",
+      "steps": [
+        "Listen once.",
+        "Repeat the full line.",
+        "Repeat it again with the same tone."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR"
+      ],
+      "listeningPackId": "neighbor-smalltalk-evening"
+    },
+    {
+      "id": "neighbor-dictation-smalltalk",
+      "kind": "dictation",
+      "title": "Dictate the small talk line",
+      "goal": "Write the warm response you hear and read it back.",
+      "prompt": "Que dicha. Cualquier cosa me avisan.",
+      "steps": [
+        "Write the opening phrase.",
+        "Write the offer of help.",
+        "Say it back naturally."
+      ],
+      "focusTagCodes": [
+        "LISTENING_MISHEAR",
+        "CLARITY_REPAIR_NEEDED"
+      ],
+      "listeningPackId": "neighbor-smalltalk-evening"
+    },
+    {
+      "id": "neighbor-partner-handoff",
+      "kind": "partner-handoff",
+      "title": "Split the greeting",
+      "goal": "Let one partner greet and the other ask a return question.",
+      "prompt": "Partner A says hello and says you are new. Partner B asks one friendly question back.",
+      "steps": [
+        "Partner A opens the chat.",
+        "Partner B asks where the neighbor is from.",
+        "Switch roles and repeat."
+      ],
+      "focusTagCodes": [
+        "WORD_ORDER"
+      ]
+    }
+  ],
+  "coupleSupport": {
+    "sharedGoal": "One partner opens the conversation and the other keeps it going with a friendly follow-up question.",
+    "partnerRoles": [
+      "Partner A greets and says you are new",
+      "Partner B asks a friendly return question"
+    ],
+    "handoffPrompts": [
+      "Ahora tu pareja hace la pregunta de regreso.",
+      "Tu turno: responde con una frase corta y amable."
+    ],
+    "keepBothInvolvedTip": "Short, warm turns feel more natural here than perfect grammar or long explanations."
+  },
+  "listeningCues": [
+    {
+      "packId": "neighbor-smalltalk-evening",
+      "focus": "friendly small talk and turn handoffs",
+      "previewLine": "Que dicha. Cualquier cosa me avisan."
+    }
   ]
 }

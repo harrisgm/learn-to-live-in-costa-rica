@@ -4,29 +4,26 @@ Last updated: 2026-03-22
 
 ## Highest-Value Near-Term Tasks
 
-1. Harden the text coach loop
-- Improve the correction/explanation/native-reply flow so it feels consistently useful for both learners.
-- Make sure recurring mistakes and session history are clearly visible and actionable.
+1. Deepen the scenario engine on top of the new structured loop
+- Add richer turn generation and scenario branching for grocery, landlord, healthcare, bank, and neighbor practice.
+- Keep scenario context explicit in the saved session and retry flow.
 
-2. Build the scenario engine properly
-- Turn the current scenario content into a stronger product loop:
-  - select scenario
-  - generate turns
-  - track practice by scenario
-  - keep results consistent across devices
+2. Turn review summaries into better drills
+- Expand the one-step retry recommendation into short drills, contrast pairs, and lightweight spaced review.
+- Keep the mistake memory machine-usable for later listening and couple-mode work.
 
 3. Strengthen couple mode
 - Move from prompts/assets alone toward a clearer partner-turn workflow in the app.
-- Define what “good couple practice” looks like and how it should be guided/scored.
+- Reuse the shared structured feedback contract so partner practice does not become a separate product fork.
 
-4. Improve first-launch household setup in the Apple app
+4. Start the listening-lab bridge
+- Use the new transcript/session contract to seed compare-dictation and natural-speed review packs.
+- Keep listening scoped to practical Costa Rica daily-life situations.
+
+5. Improve first-launch household setup in the Apple app
 - Add a small LAN URL share/copy helper.
 - Tighten the first-launch checklist.
 - Reduce friction for getting the same backend URL onto multiple family devices.
-
-5. Expand the listening workstream
-- Add real transcript-based packs, dictation, speed ladders, and local-accent exposure.
-- Make listening a deliberate workstream rather than only a future milestone label.
 
 6. Expand the learning asset system beyond week 4
 - Add the next structured lesson blocks.

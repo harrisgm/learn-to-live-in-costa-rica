@@ -1,0 +1,50 @@
+{
+  "id": "bank-service-fast",
+  "title": "Bank Service Fast Speech",
+  "scenarioId": "bank",
+  "difficulty": "intermediate",
+  "focus": "formal service language and document lists",
+  "challenge": "The clerk bundles documents, signatures, and next steps into one formal answer.",
+  "previewLine": "Necesito su documento, una constancia de domicilio y una firma aqui.",
+  "transcript": [
+    {
+      "speaker": "clerk",
+      "text": "Buenos dias. En que le puedo ayudar?",
+      "speed": "natural",
+      "note": "Formal opening"
+    },
+    {
+      "speaker": "customer",
+      "text": "Necesito ayuda con una transferencia de ayer.",
+      "speed": "natural",
+      "note": "Clear bank request"
+    },
+    {
+      "speaker": "clerk",
+      "text": "Necesito su documento, una constancia de domicilio y una firma aqui.",
+      "speed": "fast",
+      "note": "Document list"
+    },
+    {
+      "speaker": "customer",
+      "text": "Perfecto. Entonces espero la llamada para finalizar.",
+      "speed": "natural",
+      "note": "Next step"
+    }
+  ],
+  "comprehensionChecks": [
+    "What documents were requested?",
+    "What action was needed on the page?",
+    "What was the next step?"
+  ],
+  "dictationLine": "Necesito su documento, una constancia de domicilio y una firma aqui.",
+  "shadowingLines": [
+    "Necesito su documento, una constancia de domicilio y una firma aqui.",
+    "Le reviso los datos y luego le llamamos para finalizar."
+  ],
+  "cueNotes": [
+    "Formal bank speech often lists three details in one line.",
+    "Listen for the order of the document list, not just the words themselves.",
+    "The next step may be a call or a wait period, so catch the verb carefully."
+  ]
+}

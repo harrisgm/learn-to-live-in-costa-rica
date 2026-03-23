@@ -1,0 +1,50 @@
+{
+  "id": "grocery-market-fast",
+  "title": "Grocery Market Fast Speech",
+  "scenarioId": "grocery",
+  "difficulty": "beginner",
+  "focus": "checkout language, quantities, and prices",
+  "challenge": "The cashier speaks quickly and bundles the price with a bag question.",
+  "previewLine": "Me da medio kilo de tomates y un kilo de bananos?",
+  "transcript": [
+    {
+      "speaker": "cashier",
+      "text": "Buenos dias. Que necesita hoy?",
+      "speed": "natural",
+      "note": "Opening question"
+    },
+    {
+      "speaker": "customer",
+      "text": "Necesito medio kilo de tomates y un poco de arroz, por favor.",
+      "speed": "natural",
+      "note": "Quantity plus please"
+    },
+    {
+      "speaker": "cashier",
+      "text": "Claro. Son 1800 colones. Le llevo bolsa?",
+      "speed": "fast",
+      "note": "Price and bagging in one line"
+    },
+    {
+      "speaker": "customer",
+      "text": "Si, por favor. Gracias.",
+      "speed": "natural",
+      "note": "Short close"
+    }
+  ],
+  "comprehensionChecks": [
+    "What quantity was requested?",
+    "What was the price?",
+    "Did the cashier ask about a bag?"
+  ],
+  "dictationLine": "Claro. Son 1800 colones. Le llevo bolsa?",
+  "shadowingLines": [
+    "Buenos dias. Que necesita hoy?",
+    "Claro. Son 1800 colones. Le llevo bolsa?"
+  ],
+  "cueNotes": [
+    "Listen for the number before the bag question.",
+    "The cashier is likely to skip a pause between price and follow-up.",
+    "The learner should be ready to answer with a very short phrase."
+  ]
+}

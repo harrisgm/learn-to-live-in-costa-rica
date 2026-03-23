@@ -1,0 +1,50 @@
+{
+  "id": "landlord-housing-fast",
+  "title": "Landlord Housing Fast Speech",
+  "scenarioId": "landlord",
+  "difficulty": "beginner+",
+  "focus": "rent terms, deposits, and included services",
+  "challenge": "The landlord bundles rent, deposit, and utilities into one practical answer.",
+  "previewLine": "El deposito es de un mes y el agua si esta incluida.",
+  "transcript": [
+    {
+      "speaker": "landlord",
+      "text": "Buenos dias. Que duda tiene sobre la propiedad?",
+      "speed": "natural",
+      "note": "Opening question"
+    },
+    {
+      "speaker": "tenant",
+      "text": "El alquiler incluye agua e internet?",
+      "speed": "natural",
+      "note": "Included services"
+    },
+    {
+      "speaker": "landlord",
+      "text": "El deposito es de un mes y el agua si esta incluida.",
+      "speed": "fast",
+      "note": "Deposit and utility detail"
+    },
+    {
+      "speaker": "tenant",
+      "text": "Perfecto. Cuando podemos ver la propiedad?",
+      "speed": "natural",
+      "note": "Next step"
+    }
+  ],
+  "comprehensionChecks": [
+    "How much was the deposit?",
+    "What utility was included?",
+    "What was the next step?"
+  ],
+  "dictationLine": "El deposito es de un mes y el agua si esta incluida.",
+  "shadowingLines": [
+    "El deposito es de un mes y el agua si esta incluida.",
+    "Le mando el contrato y coordinamos la visita para manana."
+  ],
+  "cueNotes": [
+    "Listen for the utility word right after the deposit detail.",
+    "The next-step phrase may come very quickly after the answer.",
+    "Use this pack to practice staying calm when housing terms arrive together."
+  ]
+}
