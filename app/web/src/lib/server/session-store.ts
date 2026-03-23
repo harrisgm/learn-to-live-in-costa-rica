@@ -1,4 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import path from "node:path";
 
 import { Pool } from "pg";
 
@@ -27,10 +30,10 @@ import type {
 
 declare global {
   // eslint-disable-next-line no-var
-  var __crcMemorySessions: Map<string, PracticeSession[]> | undefined;
-  // eslint-disable-next-line no-var
   var __crcPgPool: Pool | undefined;
 }
+
+const SESSION_HISTORY_DIR_ENV = "SESSION_HISTORY_DIR";
 
 function deriveFeedbackMode(difficulty: PracticeSession["difficulty"]): FeedbackMode {
   if (difficulty === "natural" || difficulty === "costa-rica-fast") {
@@ -138,6 +141,77 @@ function asDrillKind(value: unknown): DrillKind | null {
   }
 
   return null;
+}
+
+function resolveWorkspaceRoot() {
+  let current = process.cwd();
+
+  for (let i = 0; i < 6; i += 1) {
+    if (
+      existsSync(path.join(current, "AGENTS.md")) &&
+      existsSync(path.join(current, "data", "private"))
+    ) {
+      return current;
+    }
+
+    const parent = path.dirname(current);
+
+    if (parent === current) {
+      break;
+    }
+
+    current = parent;
+  }
+
+  return process.cwd();
+}
+
+function resolveSessionHistoryDir() {
+  const override = process.env[SESSION_HISTORY_DIR_ENV]?.trim();
+
+  if (override) {
+    return path.resolve(override);
+  }
+
+  return path.join(resolveWorkspaceRoot(), "data", "private", "session-history");
+}
+
+function learnerSessionHistoryPath(learnerId: string) {
+  return path.join(
+    resolveSessionHistoryDir(),
+    `${encodeURIComponent(learnerId)}.json`
+  );
+}
+
+async function readSessionHistoryFile(learnerId: string) {
+  try {
+    const raw = await readFile(learnerSessionHistoryPath(learnerId), "utf8");
+    const parsed = JSON.parse(raw) as unknown;
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.map(normalizeStoredSession).slice(0, 120);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return [];
+    }
+
+    console.warn("Falling back to empty session history after read failure.", {
+      learnerId,
+      error
+    });
+    return [];
+  }
+}
+
+async function writeSessionHistoryFile(learnerId: string, sessions: PracticeSession[]) {
+  const filePath = learnerSessionHistoryPath(learnerId);
+  const tempPath = `${filePath}.${randomUUID()}.tmp`;
+  await mkdir(path.dirname(filePath), { recursive: true });
+  await writeFile(tempPath, `${JSON.stringify(sessions, null, 2)}\n`, "utf8");
+  await rename(tempPath, filePath);
 }
 
 function normalizeDrillSteps(value: unknown, fallbackPrompt: string): DrillStep[] {
@@ -905,31 +979,40 @@ function buildLearnerReview(
   };
 }
 
-class MemorySessionStore implements SessionStore {
-  private readonly sessions =
-    globalThis.__crcMemorySessions ?? new Map<string, PracticeSession[]>();
+class FileSessionStore implements SessionStore {
+  private pending: Promise<void> = Promise.resolve();
 
-  constructor() {
-    globalThis.__crcMemorySessions = this.sessions;
+  private async runExclusive<T>(task: () => Promise<T>): Promise<T> {
+    const next = this.pending.then(task, task);
+    this.pending = next.then(
+      () => undefined,
+      () => undefined
+    );
+    return next;
   }
 
   async listSessions(learnerId: string) {
-    const existing = this.sessions.get(learnerId) ?? [];
-    return existing.map(normalizeStoredSession).slice(0, 50);
+    return this.runExclusive(async () =>
+      (await readSessionHistoryFile(learnerId)).slice(0, 50)
+    );
   }
 
   async getLearnerReview(learnerId: string) {
-    const sessions = (this.sessions.get(learnerId) ?? [])
-      .map(normalizeStoredSession)
-      .slice(0, 120);
-    return buildLearnerReview(learnerId, sessions);
+    return this.runExclusive(async () => {
+      const sessions = await readSessionHistoryFile(learnerId);
+      return buildLearnerReview(learnerId, sessions);
+    });
   }
 
   async saveSession(session: PracticeSession) {
-    const existing = this.sessions.get(session.learnerId) ?? [];
-    const updated = [session, ...existing].map(normalizeStoredSession).slice(0, 120);
-    this.sessions.set(session.learnerId, updated);
-    return session;
+    return this.runExclusive(async () => {
+      const existing = await readSessionHistoryFile(session.learnerId);
+      const updated = [session, ...existing]
+        .map(normalizeStoredSession)
+        .slice(0, 120);
+      await writeSessionHistoryFile(session.learnerId, updated);
+      return session;
+    });
   }
 }
 
@@ -1068,7 +1151,7 @@ export function getSessionStore() {
   if (!store) {
     store = process.env.DATABASE_URL
       ? new PostgresSessionStore()
-      : new MemorySessionStore();
+      : new FileSessionStore();
   }
 
   return store;

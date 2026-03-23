@@ -120,14 +120,26 @@ async function loadOptionalScenarioPrompt(scenarioId?: string) {
     return undefined;
   }
 
-  const scenarioPromptPath = path.join(promptsRoot, "roleplay", `${scenarioId}.md`);
+  const candidateIds = Array.from(
+    new Set([scenarioId, scenarioId.replaceAll("-", "_"), scenarioId.replaceAll("_", "-")])
+  );
 
-  try {
-    await access(scenarioPromptPath);
-    return await readMarkdown(scenarioPromptPath);
-  } catch {
-    return undefined;
+  for (const candidateId of candidateIds) {
+    const scenarioPromptPath = path.join(
+      promptsRoot,
+      "roleplay",
+      `${candidateId}.md`
+    );
+
+    try {
+      await access(scenarioPromptPath);
+      return await readMarkdown(scenarioPromptPath);
+    } catch {
+      continue;
+    }
   }
+
+  return undefined;
 }
 
 export async function loadPromptBundle(

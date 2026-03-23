@@ -80,6 +80,25 @@ function activeTurn(context: CoachContext): ScenarioTurnRecord | undefined {
   );
 }
 
+function drillIdentity(drill: RecommendedDrill) {
+  return `${drill.kind}:${drill.title}:${drill.prompt}`;
+}
+
+function dedupeRecommendedDrills(drills: RecommendedDrill[]) {
+  const seen = new Set<string>();
+
+  return drills.filter((drill) => {
+    const key = drillIdentity(drill);
+
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+}
+
 function scenarioPromptSeed(context: CoachContext) {
   return (
     activeVariant(context)?.starterPrompt ??
@@ -618,22 +637,12 @@ function buildRecommendedDrills(
 
   const drills = [
     ...scenarioDrills,
-    fallbackDrill,
+    coupleDrill,
     listeningDrill,
-    coupleDrill
+    fallbackDrill
   ].filter((drill): drill is RecommendedDrill => Boolean(drill));
 
-  const seen = new Set<string>();
-  return drills.filter((drill) => {
-    const key = `${drill.kind}:${drill.title}:${drill.prompt}`;
-
-    if (seen.has(key)) {
-      return false;
-    }
-
-    seen.add(key);
-    return true;
-  }).slice(0, 4);
+  return dedupeRecommendedDrills(drills).slice(0, 4);
 }
 
 function buildReviewRecommendation(
@@ -1084,6 +1093,58 @@ function coerceRecommendedDrills(
   return parsed.length > 0 ? parsed.slice(0, 4) : fallback;
 }
 
+function mergeRecommendedDrills(
+  value: unknown,
+  fallback: RecommendedDrill[],
+  listeningPackId?: string
+) {
+  const parsed = coerceRecommendedDrills(value, fallback);
+  const required = fallback.filter(
+    (drill) =>
+      drill.kind === "partner-handoff" ||
+      (drill.kind === "dictation" &&
+        Boolean(listeningPackId) &&
+        drill.listeningPackId === listeningPackId)
+  );
+
+  if (required.length === 0) {
+    return parsed;
+  }
+
+  const requiredKeys = new Set(required.map(drillIdentity));
+  const selected = dedupeRecommendedDrills([...parsed]).slice(0, 4);
+
+  for (const drill of required) {
+    const key = drillIdentity(drill);
+
+    if (selected.some((candidate) => drillIdentity(candidate) === key)) {
+      continue;
+    }
+
+    let replaceIndex = -1;
+
+    for (let index = selected.length - 1; index >= 0; index -= 1) {
+      const candidate = selected[index];
+
+      if (candidate && !requiredKeys.has(drillIdentity(candidate))) {
+        replaceIndex = index;
+        break;
+      }
+    }
+
+    if (replaceIndex >= 0) {
+      selected.splice(replaceIndex, 1, drill);
+      continue;
+    }
+
+    if (selected.length < 4) {
+      selected.push(drill);
+    }
+  }
+
+  return dedupeRecommendedDrills(selected).slice(0, 4);
+}
+
 async function generateOpenAIFeedback(context: CoachContext) {
   const client = getOpenAIClient();
 
@@ -1184,9 +1245,10 @@ async function generateOpenAIFeedback(context: CoachContext) {
       parsed.reviewRecommendation,
       fallback.reviewRecommendation
     ),
-    recommendedDrills: coerceRecommendedDrills(
+    recommendedDrills: mergeRecommendedDrills(
       parsed.recommendedDrills,
-      fallback.recommendedDrills
+      fallback.recommendedDrills,
+      fallback.listeningRecommendation?.packId
     ),
     coupleHandoff: coerceCoupleHandoff(
       parsed.coupleHandoff,
