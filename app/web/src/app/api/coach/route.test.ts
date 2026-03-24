@@ -118,7 +118,11 @@ describe("POST /api/coach", () => {
       expect(payload.session.scenarioProgress?.completedTurnIds).toEqual([]);
       expect(payload.session.scenarioProgress?.totalTurns).toBe(3);
       expect(payload.session.scenarioProgress?.isComplete).toBe(false);
-      expect(payload.session.scenarioFamilyProgress).toBeUndefined();
+      expect(payload.session.scenarioFamilyProgress).toEqual({
+        attemptMode: "replay",
+        recommendedNextMode: "replay",
+        completedVariationIds: []
+      });
     });
   });
 
@@ -243,6 +247,11 @@ describe("POST /api/coach", () => {
             totalTurns?: number;
             isComplete?: boolean;
           };
+          scenarioFamilyProgress?: {
+            attemptMode?: string;
+            recommendedNextMode?: string;
+            completedVariationIds?: string[];
+          };
         };
       };
 
@@ -255,6 +264,131 @@ describe("POST /api/coach", () => {
       ]);
       expect(payload.session.scenarioProgress?.totalTurns).toBe(3);
       expect(payload.session.scenarioProgress?.isComplete).toBe(true);
+      expect(payload.session.scenarioFamilyProgress).toEqual({
+        attemptMode: "replay",
+        recommendedNextMode: "variation",
+        completedVariationIds: []
+      });
+    });
+  });
+
+  it("records completed grocery variations and recommends another unused variation", async () => {
+    delete process.env.OPENAI_API_KEY;
+    delete process.env.DATABASE_URL;
+
+    await withSessionHistoryDir(async () => {
+      vi.resetModules();
+      const { POST } = await import("./route");
+
+      const response = await POST(
+        new Request("http://localhost/api/coach", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            learnerId: "learner-wife-template",
+            mode: "costa-rica",
+            difficulty: "beginner+",
+            scenarioId: "grocery",
+            scenarioVariantId: "produce-stand",
+            scenarioState: {
+              currentTurnId: "grocery-turn-3"
+            },
+            scenarioProgress: {
+              completedTurnIds: ["grocery-turn-1", "grocery-turn-2"],
+              totalTurns: 3,
+              isComplete: false
+            },
+            scenarioFamilyProgress: {
+              completedVariationIds: []
+            },
+            selectedBranchOptionId: "grocery-turn-3-thanks",
+            source: "text",
+            input: "No, gracias. Eso es todo."
+          })
+        })
+      );
+
+      expect(response.status).toBe(200);
+
+      const payload = (await response.json()) as {
+        session: {
+          scenarioProgress?: { isComplete?: boolean };
+          scenarioFamilyProgress?: {
+            attemptMode?: string;
+            recommendedNextMode?: string;
+            completedVariationIds?: string[];
+          };
+        };
+      };
+
+      expect(payload.session.scenarioProgress?.isComplete).toBe(true);
+      expect(payload.session.scenarioFamilyProgress).toEqual({
+        attemptMode: "variation",
+        recommendedNextMode: "variation",
+        completedVariationIds: ["produce-stand"]
+      });
+    });
+  });
+
+  it("falls back to replay after the last unused grocery variation is completed", async () => {
+    delete process.env.OPENAI_API_KEY;
+    delete process.env.DATABASE_URL;
+
+    await withSessionHistoryDir(async () => {
+      vi.resetModules();
+      const { POST } = await import("./route");
+
+      const response = await POST(
+        new Request("http://localhost/api/coach", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            learnerId: "learner-wife-template",
+            mode: "costa-rica",
+            difficulty: "beginner+",
+            scenarioId: "grocery",
+            scenarioVariantId: "corner-store-restock",
+            scenarioState: {
+              currentTurnId: "grocery-turn-3"
+            },
+            scenarioProgress: {
+              completedTurnIds: ["grocery-turn-1", "grocery-turn-2"],
+              totalTurns: 3,
+              isComplete: false
+            },
+            scenarioFamilyProgress: {
+              completedVariationIds: ["produce-stand", "missing-variation"]
+            },
+            selectedBranchOptionId: "grocery-turn-3-bag",
+            source: "text",
+            input: "Si, por favor. Y me da el vuelto, por favor."
+          })
+        })
+      );
+
+      expect(response.status).toBe(200);
+
+      const payload = (await response.json()) as {
+        session: {
+          scenarioProgress?: { isComplete?: boolean };
+          scenarioFamilyProgress?: {
+            attemptMode?: string;
+            recommendedNextMode?: string;
+            completedVariationIds?: string[];
+          };
+        };
+      };
+
+      expect(payload.session.scenarioProgress?.isComplete).toBe(true);
+      expect(payload.session.scenarioFamilyProgress).toEqual({
+        attemptMode: "variation",
+        recommendedNextMode: "replay",
+        completedVariationIds: ["produce-stand", "corner-store-restock"]
+      });
     });
   });
 

@@ -23,6 +23,7 @@ import {
 export const runtime = "nodejs";
 
 const SCENARIO_FAMILY_PROGRESS_IDS = new Set([
+  "grocery",
   "landlord",
   "bank",
   "healthcare"
