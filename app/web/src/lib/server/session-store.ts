@@ -24,6 +24,7 @@ import type {
   RecommendedDrill,
   ReviewRecommendation,
   ScenarioFamilyProgress,
+  ScenarioIntentTag,
   ScenarioProgress,
   ScenarioSnapshot,
   ScenarioState,
@@ -268,6 +269,37 @@ function normalizeDrillSteps(value: unknown, fallbackPrompt: string): DrillStep[
       ];
 }
 
+const GROCERY_SCENARIO_ID = "grocery";
+const SCENARIO_INTENT_TAGS: ScenarioIntentTag[] = [
+  "open-order",
+  "confirm-amount",
+  "close-checkout"
+];
+
+function normalizeScenarioIntentTag(
+  value: unknown
+): ScenarioIntentTag | undefined {
+  return typeof value === "string" &&
+    SCENARIO_INTENT_TAGS.includes(value as ScenarioIntentTag)
+    ? (value as ScenarioIntentTag)
+    : undefined;
+}
+
+function normalizeCompletedIntentTags(value: unknown): ScenarioIntentTag[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      value.flatMap((intentTag) => {
+        const normalized = normalizeScenarioIntentTag(intentTag);
+        return normalized ? [normalized] : [];
+      })
+    )
+  );
+}
+
 function normalizeScenarioSnapshot(
   value: unknown,
   scenarioId: string
@@ -312,7 +344,8 @@ function normalizeScenarioSnapshot(
         listeningPackTitle:
           typeof candidate.listeningPackTitle === "string"
             ? candidate.listeningPackTitle
-            : undefined
+            : undefined,
+        intentTag: normalizeScenarioIntentTag(candidate.intentTag)
       };
     }
   }
@@ -375,7 +408,8 @@ function normalizeScenarioProgress(value: unknown): ScenarioProgress | undefined
 }
 
 function normalizeScenarioFamilyProgress(
-  value: unknown
+  value: unknown,
+  scenarioId: string
 ): ScenarioFamilyProgress | undefined {
   if (!value || typeof value !== "object") {
     return undefined;
@@ -402,16 +436,48 @@ function normalizeScenarioFamilyProgress(
     candidate.recommendedNextMode === "variation"
       ? candidate.recommendedNextMode
       : undefined;
+  const recommendedNextIntentTag = normalizeScenarioIntentTag(
+    candidate.recommendedNextIntentTag
+  );
+  const shouldIncludeIntentHistory =
+    scenarioId === GROCERY_SCENARIO_ID ||
+    Array.isArray(candidate.completedIntentTags) ||
+    recommendedNextIntentTag !== undefined;
 
-  if (!attemptMode && !recommendedNextMode && completedVariationIds.length === 0) {
+  if (
+    !attemptMode &&
+    !recommendedNextMode &&
+    completedVariationIds.length === 0 &&
+    !shouldIncludeIntentHistory
+  ) {
     return undefined;
   }
 
-  return {
-    attemptMode,
-    recommendedNextMode,
-    completedVariationIds
-  };
+  const normalized: ScenarioFamilyProgress = {};
+
+  if (attemptMode) {
+    normalized.attemptMode = attemptMode;
+  }
+
+  if (recommendedNextMode) {
+    normalized.recommendedNextMode = recommendedNextMode;
+  }
+
+  if (completedVariationIds.length > 0 || attemptMode || recommendedNextMode) {
+    normalized.completedVariationIds = completedVariationIds;
+  }
+
+  if (shouldIncludeIntentHistory) {
+    normalized.completedIntentTags = normalizeCompletedIntentTags(
+      candidate.completedIntentTags
+    );
+
+    if (recommendedNextIntentTag) {
+      normalized.recommendedNextIntentTag = recommendedNextIntentTag;
+    }
+  }
+
+  return normalized;
 }
 
 function normalizeErrorTags(value: unknown): ErrorTag[] {
@@ -888,7 +954,8 @@ function normalizeStoredSession(value: unknown): PracticeSession {
     raw.scenarioProgress ?? raw.scenario_progress
   );
   const scenarioFamilyProgress = normalizeScenarioFamilyProgress(
-    raw.scenarioFamilyProgress ?? raw.scenario_family_progress
+    raw.scenarioFamilyProgress ?? raw.scenario_family_progress,
+    scenarioId
   );
 
   return {

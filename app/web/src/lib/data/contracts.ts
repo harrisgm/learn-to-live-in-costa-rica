@@ -7,6 +7,7 @@ import type {
   PracticeMode,
   PracticeSession,
   ScenarioFamilyProgress,
+  ScenarioIntentTag,
   ScenarioProgress,
   ScenarioState,
   SessionSource
@@ -150,6 +151,7 @@ export interface CoachRequest {
   scenarioState?: ScenarioState;
   scenarioProgress?: ScenarioProgress;
   scenarioFamilyProgress?: ScenarioFamilyProgress;
+  scenarioIntentTag?: ScenarioIntentTag;
   selectedBranchOptionId?: string;
   listeningPackId?: string;
 }

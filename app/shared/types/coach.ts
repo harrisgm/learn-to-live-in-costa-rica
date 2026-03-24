@@ -81,6 +81,11 @@ export interface ListeningRecommendation {
   previewLine: string;
 }
 
+export type ScenarioIntentTag =
+  | "open-order"
+  | "confirm-amount"
+  | "close-checkout";
+
 export interface ScenarioSnapshot {
   id: string;
   title: string;
@@ -94,6 +99,7 @@ export interface ScenarioSnapshot {
   partnerRole?: string;
   listeningPackId?: string;
   listeningPackTitle?: string;
+  intentTag?: ScenarioIntentTag;
 }
 
 export interface ScenarioState {
@@ -112,6 +118,8 @@ export interface ScenarioFamilyProgress {
   attemptMode?: ScenarioAttemptMode;
   recommendedNextMode?: ScenarioAttemptMode;
   completedVariationIds?: string[];
+  completedIntentTags?: ScenarioIntentTag[];
+  recommendedNextIntentTag?: ScenarioIntentTag;
 }
 
 export interface RecommendedDrill {

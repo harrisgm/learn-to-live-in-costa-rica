@@ -227,9 +227,15 @@ struct ServerSettingsView: View {
                 .foregroundStyle(CoachVisuals.terracotta)
 
             #if os(iOS)
-            TextField("http://192.168.1.40:3000", text: $draftURL)
+            TextField(text: $draftURL) {
+                Text("http://192.168.1.40:3000")
+                    .foregroundStyle(CoachVisuals.coffee.opacity(0.46))
+            }
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .font(.body.monospaced())
+                .foregroundStyle(CoachVisuals.coffee)
+                .tint(CoachVisuals.ocean)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
                 .background(
@@ -241,8 +247,14 @@ struct ServerSettingsView: View {
                         .stroke(Color.white.opacity(0.46), lineWidth: 1)
                 )
             #else
-            TextField("http://192.168.1.40:3000", text: $draftURL)
+            TextField(text: $draftURL) {
+                Text("http://192.168.1.40:3000")
+                    .foregroundStyle(CoachVisuals.coffee.opacity(0.46))
+            }
                 .textFieldStyle(.plain)
+                .font(.body.monospaced())
+                .foregroundStyle(CoachVisuals.coffee)
+                .tint(CoachVisuals.ocean)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
                 .background(

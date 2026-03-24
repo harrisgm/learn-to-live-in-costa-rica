@@ -237,6 +237,43 @@ struct ScenarioRecord: Codable, Identifiable, Hashable {
     let followUpDrills: [ScenarioDrillRecord]
     let coupleSupport: CoupleSupportRecord?
     let listeningCues: [ListeningCueRecord]?
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case setting
+        case difficulty
+        case userGoal
+        case mustKnowVocabulary
+        case starterPrompts
+        case culturalNotes
+        case partnerRoles
+        case likelyMisunderstandings
+        case variants
+        case turns
+        case followUpDrills
+        case coupleSupport
+        case listeningCues
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        setting = try container.decode(String.self, forKey: .setting)
+        difficulty = try container.decode(Difficulty.self, forKey: .difficulty)
+        userGoal = try container.decode(String.self, forKey: .userGoal)
+        mustKnowVocabulary = try container.decode([String].self, forKey: .mustKnowVocabulary)
+        starterPrompts = try container.decode([String].self, forKey: .starterPrompts)
+        culturalNotes = try container.decodeIfPresent([String].self, forKey: .culturalNotes)
+        partnerRoles = try container.decodeIfPresent([String].self, forKey: .partnerRoles) ?? []
+        likelyMisunderstandings = try container.decodeIfPresent([String].self, forKey: .likelyMisunderstandings) ?? []
+        variants = try container.decodeIfPresent([ScenarioVariantRecord].self, forKey: .variants) ?? []
+        turns = try container.decodeIfPresent([ScenarioTurnRecord].self, forKey: .turns) ?? []
+        followUpDrills = try container.decodeIfPresent([ScenarioDrillRecord].self, forKey: .followUpDrills) ?? []
+        coupleSupport = try container.decodeIfPresent(CoupleSupportRecord.self, forKey: .coupleSupport)
+        listeningCues = try container.decodeIfPresent([ListeningCueRecord].self, forKey: .listeningCues)
+    }
 }
 
 struct ListeningTranscriptLineRecord: Codable, Hashable {

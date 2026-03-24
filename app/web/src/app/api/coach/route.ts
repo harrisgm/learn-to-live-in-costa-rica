@@ -6,7 +6,11 @@ import type {
   ScenarioRecord,
   ScenarioTurnRecord
 } from "@/lib/data/contracts";
-import type { ScenarioAttemptMode, ScenarioFamilyProgress } from "@/lib/types";
+import type {
+  ScenarioAttemptMode,
+  ScenarioFamilyProgress,
+  ScenarioIntentTag
+} from "@/lib/types";
 import {
   findLearner,
   findListeningPack,
@@ -31,6 +35,25 @@ const SCENARIO_FAMILY_PROGRESS_IDS = new Set([
 
 function supportsScenarioFamilyProgress(scenarioId: string) {
   return SCENARIO_FAMILY_PROGRESS_IDS.has(scenarioId);
+}
+
+const GROCERY_INTENT_TAG_SEQUENCE: ScenarioIntentTag[] = [
+  "open-order",
+  "confirm-amount",
+  "close-checkout"
+];
+
+const GROCERY_TURN_INTENT_TAGS: Partial<Record<string, ScenarioIntentTag>> = {
+  "grocery-turn-1": "open-order",
+  "grocery-turn-2": "confirm-amount",
+  "grocery-turn-3": "close-checkout"
+};
+
+function isScenarioIntentTag(value: unknown): value is ScenarioIntentTag {
+  return (
+    typeof value === "string" &&
+    GROCERY_INTENT_TAG_SEQUENCE.includes(value as ScenarioIntentTag)
+  );
 }
 
 function resolveCurrentTurnId(
@@ -118,13 +141,60 @@ function normalizeCompletedVariationIds(
   );
 }
 
+function normalizeCompletedIntentTags(payload: Partial<CoachRequest>) {
+  return Array.from(
+    new Set(
+      (payload.scenarioFamilyProgress?.completedIntentTags ?? []).filter(
+        isScenarioIntentTag
+      )
+    )
+  );
+}
+
+function resolveScenarioIntentTag(
+  payload: Partial<CoachRequest>,
+  scenario: ScenarioRecord,
+  turn: ScenarioTurnRecord | undefined
+) {
+  if (scenario.id !== "grocery") {
+    return undefined;
+  }
+
+  if (isScenarioIntentTag(payload.scenarioIntentTag)) {
+    return payload.scenarioIntentTag;
+  }
+
+  return turn ? GROCERY_TURN_INTENT_TAGS[turn.id] : undefined;
+}
+
+function resolveRecommendedNextIntentTag(
+  completedIntentTags: ScenarioIntentTag[]
+) {
+  return (
+    GROCERY_INTENT_TAG_SEQUENCE.find(
+      (intentTag) => !completedIntentTags.includes(intentTag)
+    ) ?? GROCERY_INTENT_TAG_SEQUENCE[0]
+  );
+}
+
 function buildScenarioFamilyProgress(input: {
   payload: Partial<CoachRequest>;
   scenario: ScenarioRecord;
   selectedVariantId?: string;
   isComplete: boolean;
+  didAdvanceScenario: boolean;
+  selectedTurn?: ScenarioTurnRecord;
+  intentTag?: ScenarioIntentTag;
 }): ScenarioFamilyProgress | undefined {
-  const { payload, scenario, selectedVariantId, isComplete } = input;
+  const {
+    payload,
+    scenario,
+    selectedVariantId,
+    isComplete,
+    didAdvanceScenario,
+    selectedTurn,
+    intentTag
+  } = input;
 
   if (!supportsScenarioFamilyProgress(scenario.id)) {
     return undefined;
@@ -143,12 +213,29 @@ function buildScenarioFamilyProgress(input: {
         ? [variant.id]
         : []
     );
-
-  return {
+  const familyProgress: ScenarioFamilyProgress = {
     attemptMode,
     recommendedNextMode:
       !isComplete || remainingVariationIds.length === 0 ? "replay" : "variation",
     completedVariationIds: updatedCompletedVariationIds
+  };
+
+  if (scenario.id !== "grocery") {
+    return familyProgress;
+  }
+
+  const completedIntentTags = normalizeCompletedIntentTags(payload);
+  const updatedCompletedIntentTags =
+    didAdvanceScenario && selectedTurn && intentTag
+      ? Array.from(new Set([...completedIntentTags, intentTag]))
+      : completedIntentTags;
+
+  return {
+    ...familyProgress,
+    completedIntentTags: updatedCompletedIntentTags,
+    recommendedNextIntentTag: resolveRecommendedNextIntentTag(
+      updatedCompletedIntentTags
+    )
   };
 }
 
@@ -218,6 +305,7 @@ export async function POST(request: Request) {
     },
     listeningPack
   });
+  const resolvedIntentTag = resolveScenarioIntentTag(payload, scenario, selectedTurn);
   const didAdvanceScenario = feedback.errorTags.length === 0;
   const nextTurn = selectedBranch
     ? scenario.turns.find((turn) => turn.id === selectedBranch.nextTurnId)
@@ -239,7 +327,10 @@ export async function POST(request: Request) {
     payload,
     scenario,
     selectedVariantId: selectedVariant?.id,
-    isComplete: scenarioProgress.isComplete
+    isComplete: scenarioProgress.isComplete,
+    didAdvanceScenario,
+    selectedTurn,
+    intentTag: resolvedIntentTag
   });
   const scenarioState = selectedTurn
     ? {
@@ -266,7 +357,8 @@ export async function POST(request: Request) {
       turnPrompt: selectedTurn?.prompt,
       partnerRole: selectedTurn?.localRole ?? scenario.partnerRoles[0],
       listeningPackId: listeningPack?.id,
-      listeningPackTitle: listeningPack?.title
+      listeningPackTitle: listeningPack?.title,
+      intentTag: resolvedIntentTag
     },
     scenarioState,
     scenarioProgress,

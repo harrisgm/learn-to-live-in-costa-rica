@@ -29,6 +29,32 @@ describe("data loaders", () => {
     expect(listeningPack?.dictationLine).toContain("1800");
   });
 
+  it("normalizes skeletal scenarios into a bootstrap-safe shape", async () => {
+    const { loadBootstrapPayload } = await import("./loaders");
+
+    const payload = await loadBootstrapPayload();
+    const immigration = payload.scenarios.find(
+      (scenario) => scenario.id === "immigration"
+    );
+    const utilities = payload.scenarios.find(
+      (scenario) => scenario.id === "utilities"
+    );
+
+    expect(immigration).toBeDefined();
+    expect(immigration?.partnerRoles).toEqual([]);
+    expect(immigration?.likelyMisunderstandings).toEqual([]);
+    expect(immigration?.variants).toEqual([]);
+    expect(immigration?.turns).toEqual([]);
+    expect(immigration?.followUpDrills).toEqual([]);
+
+    expect(utilities).toBeDefined();
+    expect(utilities?.partnerRoles).toEqual([]);
+    expect(utilities?.likelyMisunderstandings).toEqual([]);
+    expect(utilities?.variants).toEqual([]);
+    expect(utilities?.turns).toEqual([]);
+    expect(utilities?.followUpDrills).toEqual([]);
+  });
+
   it("loads scenario-specific roleplay prompts when present", async () => {
     const { loadPromptBundle } = await import("./loaders");
 

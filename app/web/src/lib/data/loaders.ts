@@ -29,6 +29,43 @@ async function readMarkdown(filePath: string) {
   return readFile(filePath, "utf8");
 }
 
+type ScenarioRecordInput = Omit<
+  ScenarioRecord,
+  | "culturalNotes"
+  | "partnerRoles"
+  | "likelyMisunderstandings"
+  | "variants"
+  | "turns"
+  | "followUpDrills"
+> &
+  Partial<
+    Pick<
+      ScenarioRecord,
+      | "culturalNotes"
+      | "partnerRoles"
+      | "likelyMisunderstandings"
+      | "variants"
+      | "turns"
+      | "followUpDrills"
+    >
+  >;
+
+function normalizeArray<T>(value: T[] | undefined) {
+  return Array.isArray(value) ? value : [];
+}
+
+function normalizeScenarioRecord(scenario: ScenarioRecordInput): ScenarioRecord {
+  return {
+    ...scenario,
+    culturalNotes: normalizeArray(scenario.culturalNotes),
+    partnerRoles: normalizeArray(scenario.partnerRoles),
+    likelyMisunderstandings: normalizeArray(scenario.likelyMisunderstandings),
+    variants: normalizeArray(scenario.variants),
+    turns: normalizeArray(scenario.turns),
+    followUpDrills: normalizeArray(scenario.followUpDrills)
+  };
+}
+
 export async function loadLearners() {
   if (learnersCache) {
     return learnersCache;
@@ -59,8 +96,10 @@ export async function loadScenarios() {
   const scenarioFiles = entries.filter((entry) => entry.endsWith(".json")).sort();
 
   scenariosCache = await Promise.all(
-    scenarioFiles.map((entry) =>
-      readJsonFile<ScenarioRecord>(path.join(scenariosDir, entry))
+    scenarioFiles.map(async (entry) =>
+      normalizeScenarioRecord(
+        await readJsonFile<ScenarioRecordInput>(path.join(scenariosDir, entry))
+      )
     )
   );
 

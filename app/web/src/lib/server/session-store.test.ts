@@ -248,6 +248,49 @@ describe("session store review summary", () => {
     });
   });
 
+  it("persists grocery intent history and reloads it with sanitized values", async () => {
+    delete process.env.DATABASE_URL;
+
+    await withSessionHistoryDir(async () => {
+      const { getSessionStore } = await import("./session-store");
+      const store = getSessionStore();
+      const session = buildSession(
+        "intent-history-session-1",
+        "2026-03-22T01:30:00.000Z",
+        "Try again with one short useful sentence.",
+        "Retry Register Mismatch",
+        "Claro. Son 1800 colones. Le llevo bolsa?"
+      );
+
+      await store.saveSession({
+        ...session,
+        scenarioSnapshot: {
+          ...session.scenarioSnapshot,
+          turnId: "grocery-turn-2",
+          turnLabel: "Confirm the amount",
+          intentTag: "confirm-amount"
+        },
+        scenarioFamilyProgress: {
+          completedIntentTags: [
+            "open-order",
+            "confirm-amount",
+            "confirm-amount",
+            "bad-tag" as never
+          ],
+          recommendedNextIntentTag: "close-checkout"
+        }
+      });
+
+      const sessions = await store.listSessions("learner-review-test");
+
+      expect(sessions[0]?.scenarioSnapshot.intentTag).toBe("confirm-amount");
+      expect(sessions[0]?.scenarioFamilyProgress).toEqual({
+        completedIntentTags: ["open-order", "confirm-amount"],
+        recommendedNextIntentTag: "close-checkout"
+      });
+    });
+  });
+
   it("persists scenarioFamilyProgress and normalizes missing variation arrays", async () => {
     delete process.env.DATABASE_URL;
 
@@ -282,6 +325,46 @@ describe("session store review summary", () => {
         attemptMode: "variation",
         recommendedNextMode: "replay",
         completedVariationIds: []
+      });
+    });
+  });
+
+  it("loads older grocery replay progress without intent fields and normalizes missing completedIntentTags", async () => {
+    delete process.env.DATABASE_URL;
+
+    await withSessionHistoryDir(async (dir) => {
+      const legacySession = {
+        ...buildSession(
+          "legacy-family-session-1",
+          "2026-03-22T02:30:00.000Z",
+          "Try again with one short useful sentence.",
+          "Retry Register Mismatch",
+          "Me da medio kilo de tomates y un kilo de bananos?"
+        ),
+        scenarioFamilyProgress: {
+          attemptMode: "variation" as const,
+          recommendedNextMode: "replay" as const,
+          completedVariationIds: ["produce-stand"]
+        }
+      };
+
+      await writeFile(
+        path.join(dir, "learner-review-test.json"),
+        `${JSON.stringify([legacySession], null, 2)}\n`,
+        "utf8"
+      );
+
+      vi.resetModules();
+      const { getSessionStore } = await import("./session-store");
+      const store = getSessionStore();
+      const sessions = await store.listSessions("learner-review-test");
+
+      expect(sessions[0]?.scenarioSnapshot.intentTag).toBeUndefined();
+      expect(sessions[0]?.scenarioFamilyProgress).toEqual({
+        attemptMode: "variation",
+        recommendedNextMode: "replay",
+        completedVariationIds: ["produce-stand"],
+        completedIntentTags: []
       });
     });
   });

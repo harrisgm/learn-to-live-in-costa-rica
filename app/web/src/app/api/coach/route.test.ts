@@ -102,18 +102,25 @@ describe("POST /api/coach", () => {
 
       const payload = (await response.json()) as {
         session: {
-          scenarioSnapshot: { turnId?: string };
+          scenarioSnapshot: { turnId?: string; intentTag?: string };
           scenarioState?: { currentTurnId?: string };
           scenarioProgress?: {
             completedTurnIds?: string[];
             totalTurns?: number;
             isComplete?: boolean;
           };
-          scenarioFamilyProgress?: unknown;
+          scenarioFamilyProgress?: {
+            attemptMode?: string;
+            recommendedNextMode?: string;
+            completedVariationIds?: string[];
+            completedIntentTags?: string[];
+            recommendedNextIntentTag?: string;
+          };
         };
       };
 
       expect(payload.session.scenarioSnapshot.turnId).toBe("grocery-turn-1");
+      expect(payload.session.scenarioSnapshot.intentTag).toBe("open-order");
       expect(payload.session.scenarioState?.currentTurnId).toBe("grocery-turn-1");
       expect(payload.session.scenarioProgress?.completedTurnIds).toEqual([]);
       expect(payload.session.scenarioProgress?.totalTurns).toBe(3);
@@ -121,7 +128,9 @@ describe("POST /api/coach", () => {
       expect(payload.session.scenarioFamilyProgress).toEqual({
         attemptMode: "replay",
         recommendedNextMode: "replay",
-        completedVariationIds: []
+        completedVariationIds: [],
+        completedIntentTags: [],
+        recommendedNextIntentTag: "open-order"
       });
     });
   });
@@ -166,12 +175,20 @@ describe("POST /api/coach", () => {
             variantId?: string;
             turnId?: string;
             listeningPackId?: string;
+            intentTag?: string;
           };
           scenarioState?: { currentTurnId?: string };
           scenarioProgress?: {
             completedTurnIds?: string[];
             totalTurns?: number;
             isComplete?: boolean;
+          };
+          scenarioFamilyProgress?: {
+            attemptMode?: string;
+            recommendedNextMode?: string;
+            completedVariationIds?: string[];
+            completedIntentTags?: string[];
+            recommendedNextIntentTag?: string;
           };
           feedback: {
             recommendedDrills: unknown[];
@@ -185,12 +202,20 @@ describe("POST /api/coach", () => {
         "market-quick-checkout"
       );
       expect(payload.session.scenarioSnapshot.turnId).toBe("grocery-turn-1");
+      expect(payload.session.scenarioSnapshot.intentTag).toBe("open-order");
       expect(payload.session.scenarioState?.currentTurnId).toBe("grocery-turn-2");
       expect(payload.session.scenarioProgress?.completedTurnIds).toEqual([
         "grocery-turn-1"
       ]);
       expect(payload.session.scenarioProgress?.totalTurns).toBe(3);
       expect(payload.session.scenarioProgress?.isComplete).toBe(false);
+      expect(payload.session.scenarioFamilyProgress).toEqual({
+        attemptMode: "replay",
+        recommendedNextMode: "replay",
+        completedVariationIds: [],
+        completedIntentTags: ["open-order"],
+        recommendedNextIntentTag: "confirm-amount"
+      });
       expect(payload.session.scenarioSnapshot.listeningPackId).toBe(
         "grocery-market-fast"
       );
@@ -199,6 +224,132 @@ describe("POST /api/coach", () => {
       expect(payload.session.feedback.listeningRecommendation?.packId).toBe(
         "grocery-market-fast"
       );
+    });
+  });
+
+  it("records confirm-amount after a successful grocery turn two", async () => {
+    delete process.env.OPENAI_API_KEY;
+    delete process.env.DATABASE_URL;
+
+    await withSessionHistoryDir(async () => {
+      vi.resetModules();
+      const { POST } = await import("./route");
+
+      const response = await POST(
+        new Request("http://localhost/api/coach", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            learnerId: "learner-wife-template",
+            mode: "couple",
+            difficulty: "beginner+",
+            scenarioId: "grocery",
+            scenarioState: {
+              currentTurnId: "grocery-turn-2"
+            },
+            scenarioProgress: {
+              completedTurnIds: ["grocery-turn-1"],
+              totalTurns: 3,
+              isComplete: false
+            },
+            scenarioFamilyProgress: {
+              completedIntentTags: ["open-order"]
+            },
+            selectedBranchOptionId: "grocery-turn-2-confirm",
+            source: "text",
+            input: "Si, esta bien. Tambien necesito una bolsa."
+          })
+        })
+      );
+
+      expect(response.status).toBe(200);
+
+      const payload = (await response.json()) as {
+        session: {
+          scenarioSnapshot: { turnId?: string; intentTag?: string };
+          scenarioState?: { currentTurnId?: string };
+          scenarioProgress?: {
+            completedTurnIds?: string[];
+            totalTurns?: number;
+            isComplete?: boolean;
+          };
+          scenarioFamilyProgress?: {
+            attemptMode?: string;
+            recommendedNextMode?: string;
+            completedVariationIds?: string[];
+            completedIntentTags?: string[];
+            recommendedNextIntentTag?: string;
+          };
+        };
+      };
+
+      expect(payload.session.scenarioSnapshot.turnId).toBe("grocery-turn-2");
+      expect(payload.session.scenarioSnapshot.intentTag).toBe("confirm-amount");
+      expect(payload.session.scenarioState?.currentTurnId).toBe("grocery-turn-3");
+      expect(payload.session.scenarioProgress?.completedTurnIds).toEqual([
+        "grocery-turn-1",
+        "grocery-turn-2"
+      ]);
+      expect(payload.session.scenarioProgress?.totalTurns).toBe(3);
+      expect(payload.session.scenarioProgress?.isComplete).toBe(false);
+      expect(payload.session.scenarioFamilyProgress).toEqual({
+        attemptMode: "replay",
+        recommendedNextMode: "replay",
+        completedVariationIds: [],
+        completedIntentTags: ["open-order", "confirm-amount"],
+        recommendedNextIntentTag: "close-checkout"
+      });
+    });
+  });
+
+  it("dedupes repeated successful completion of the same grocery intent tag", async () => {
+    delete process.env.OPENAI_API_KEY;
+    delete process.env.DATABASE_URL;
+
+    await withSessionHistoryDir(async () => {
+      vi.resetModules();
+      const { POST } = await import("./route");
+
+      const response = await POST(
+        new Request("http://localhost/api/coach", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            learnerId: "learner-guy-template",
+            mode: "tutor",
+            difficulty: "beginner",
+            scenarioId: "grocery",
+            scenarioFamilyProgress: {
+              completedIntentTags: ["open-order", "open-order", "bad-tag"]
+            },
+            selectedBranchOptionId: "grocery-turn-1-qty",
+            source: "text",
+            input: "Buenos dias, necesito medio kilo de arroz, por favor."
+          })
+        })
+      );
+
+      expect(response.status).toBe(200);
+
+      const payload = (await response.json()) as {
+        session: {
+          scenarioFamilyProgress?: {
+            completedIntentTags?: string[];
+            recommendedNextIntentTag?: string;
+          };
+        };
+      };
+
+      expect(payload.session.scenarioFamilyProgress?.completedIntentTags).toEqual([
+        "open-order"
+      ]);
+      expect(
+        payload.session.scenarioFamilyProgress?.recommendedNextIntentTag
+      ).toBe("confirm-amount");
     });
   });
 
@@ -229,6 +380,9 @@ describe("POST /api/coach", () => {
               totalTurns: 3,
               isComplete: false
             },
+            scenarioFamilyProgress: {
+              completedIntentTags: ["open-order", "confirm-amount"]
+            },
             selectedBranchOptionId: "grocery-turn-3-bag",
             source: "text",
             input: "No, gracias. Eso es todo."
@@ -240,7 +394,7 @@ describe("POST /api/coach", () => {
 
       const payload = (await response.json()) as {
         session: {
-          scenarioSnapshot: { turnId?: string };
+          scenarioSnapshot: { turnId?: string; intentTag?: string };
           scenarioState?: { currentTurnId?: string };
           scenarioProgress?: {
             completedTurnIds?: string[];
@@ -251,11 +405,14 @@ describe("POST /api/coach", () => {
             attemptMode?: string;
             recommendedNextMode?: string;
             completedVariationIds?: string[];
+            completedIntentTags?: string[];
+            recommendedNextIntentTag?: string;
           };
         };
       };
 
       expect(payload.session.scenarioSnapshot.turnId).toBe("grocery-turn-3");
+      expect(payload.session.scenarioSnapshot.intentTag).toBe("close-checkout");
       expect(payload.session.scenarioState?.currentTurnId).toBe("grocery-turn-3");
       expect(payload.session.scenarioProgress?.completedTurnIds).toEqual([
         "grocery-turn-1",
@@ -267,7 +424,13 @@ describe("POST /api/coach", () => {
       expect(payload.session.scenarioFamilyProgress).toEqual({
         attemptMode: "replay",
         recommendedNextMode: "variation",
-        completedVariationIds: []
+        completedVariationIds: [],
+        completedIntentTags: [
+          "open-order",
+          "confirm-amount",
+          "close-checkout"
+        ],
+        recommendedNextIntentTag: "open-order"
       });
     });
   });
@@ -319,6 +482,8 @@ describe("POST /api/coach", () => {
             attemptMode?: string;
             recommendedNextMode?: string;
             completedVariationIds?: string[];
+            completedIntentTags?: string[];
+            recommendedNextIntentTag?: string;
           };
         };
       };
@@ -327,7 +492,9 @@ describe("POST /api/coach", () => {
       expect(payload.session.scenarioFamilyProgress).toEqual({
         attemptMode: "variation",
         recommendedNextMode: "variation",
-        completedVariationIds: ["produce-stand"]
+        completedVariationIds: ["produce-stand"],
+        completedIntentTags: ["close-checkout"],
+        recommendedNextIntentTag: "open-order"
       });
     });
   });
@@ -379,6 +546,8 @@ describe("POST /api/coach", () => {
             attemptMode?: string;
             recommendedNextMode?: string;
             completedVariationIds?: string[];
+            completedIntentTags?: string[];
+            recommendedNextIntentTag?: string;
           };
         };
       };
@@ -387,7 +556,9 @@ describe("POST /api/coach", () => {
       expect(payload.session.scenarioFamilyProgress).toEqual({
         attemptMode: "variation",
         recommendedNextMode: "replay",
-        completedVariationIds: ["produce-stand", "corner-store-restock"]
+        completedVariationIds: ["produce-stand", "corner-store-restock"],
+        completedIntentTags: ["close-checkout"],
+        recommendedNextIntentTag: "open-order"
       });
     });
   });
