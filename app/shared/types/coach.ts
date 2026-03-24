@@ -96,6 +96,24 @@ export interface ScenarioSnapshot {
   listeningPackTitle?: string;
 }
 
+export interface ScenarioState {
+  currentTurnId: string;
+}
+
+export interface ScenarioProgress {
+  completedTurnIds: string[];
+  totalTurns: number;
+  isComplete: boolean;
+}
+
+export type ScenarioAttemptMode = "replay" | "variation";
+
+export interface ScenarioFamilyProgress {
+  attemptMode?: ScenarioAttemptMode;
+  recommendedNextMode?: ScenarioAttemptMode;
+  completedVariationIds?: string[];
+}
+
 export interface RecommendedDrill {
   id: string;
   kind: DrillKind;
@@ -140,6 +158,9 @@ export interface PracticeSession {
   difficulty: Difficulty;
   scenarioId: string;
   scenarioSnapshot: ScenarioSnapshot;
+  scenarioState?: ScenarioState;
+  scenarioProgress?: ScenarioProgress;
+  scenarioFamilyProgress?: ScenarioFamilyProgress;
   source: SessionSource;
   learnerId: string;
   userInput: string;

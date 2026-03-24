@@ -13,7 +13,13 @@ describe("data loaders", () => {
     expect(payload.learners.length).toBeGreaterThan(0);
     expect(payload.listeningPacks.length).toBeGreaterThanOrEqual(5);
     expect(grocery?.variants.length).toBeGreaterThan(0);
+    expect(grocery?.turns[0]?.id).toBe("grocery-turn-1");
     expect(grocery?.turns[0]?.branchOptions.length).toBeGreaterThan(0);
+    expect(
+      grocery?.turns.some(
+        (turn) => turn.id === grocery.turns[0]?.branchOptions[0]?.nextTurnId
+      )
+    ).toBe(true);
     expect(grocery?.coupleSupport?.handoffPrompts.length).toBeGreaterThan(0);
     expect(grocery?.listeningCues?.[0]?.packId).toBe("grocery-market-fast");
 

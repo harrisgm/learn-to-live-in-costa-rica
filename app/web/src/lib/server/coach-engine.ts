@@ -73,9 +73,13 @@ function activeVariant(context: CoachContext): ScenarioVariantRecord | undefined
 }
 
 function activeTurn(context: CoachContext): ScenarioTurnRecord | undefined {
+  const currentTurnId =
+    context.request.scenarioState?.currentTurnId ??
+    context.request.scenarioTurnId;
+
   return (
     context.scenario.turns.find(
-      (turn) => turn.id === context.request.scenarioTurnId
+      (turn) => turn.id === currentTurnId
     ) ?? context.scenario.turns[0]
   );
 }

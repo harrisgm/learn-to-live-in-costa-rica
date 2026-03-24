@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -36,6 +36,17 @@ function buildSession(
       partnerRole: "cashier",
       listeningPackId: "grocery-market-fast",
       listeningPackTitle: "Grocery Market Fast Speech"
+    },
+    scenarioState: {
+      currentTurnId: id === "session-1" ? "grocery-turn-2" : "grocery-turn-3"
+    },
+    scenarioProgress: {
+      completedTurnIds:
+        id === "session-1"
+          ? ["grocery-turn-1"]
+          : ["grocery-turn-1", "grocery-turn-2"],
+      totalTurns: 3,
+      isComplete: false
     },
     source: "speech",
     userInput: "Yo necesito arroz, por favor.",
@@ -185,6 +196,11 @@ describe("session store review summary", () => {
       const review = await store.getLearnerReview("learner-review-test");
 
       expect(sessions[0]?.scenarioSnapshot.turnId).toBe("grocery-turn-2");
+      expect(sessions[0]?.scenarioState?.currentTurnId).toBe("grocery-turn-3");
+      expect(sessions[0]?.scenarioProgress?.completedTurnIds).toEqual([
+        "grocery-turn-1",
+        "grocery-turn-2"
+      ]);
       expect(sessions[0]?.feedback.listeningRecommendation?.packId).toBe(
         "grocery-market-fast"
       );
@@ -225,6 +241,86 @@ describe("session store review summary", () => {
       expect(sessions).toHaveLength(1);
       expect(sessions[0]?.id).toBe("session-1");
       expect(sessions[0]?.scenarioSnapshot.turnId).toBe("grocery-turn-1");
+      expect(sessions[0]?.scenarioState?.currentTurnId).toBe("grocery-turn-2");
+      expect(sessions[0]?.scenarioProgress?.completedTurnIds).toEqual([
+        "grocery-turn-1"
+      ]);
+    });
+  });
+
+  it("persists scenarioFamilyProgress and normalizes missing variation arrays", async () => {
+    delete process.env.DATABASE_URL;
+
+    await withSessionHistoryDir(async () => {
+      const { getSessionStore } = await import("./session-store");
+      const store = getSessionStore();
+      const session = buildSession(
+        "family-session-1",
+        "2026-03-22T02:00:00.000Z",
+        "Try again with one short useful sentence.",
+        "Retry Register Mismatch",
+        "Me da medio kilo de tomates y un kilo de bananos?"
+      );
+
+      await store.saveSession({
+        ...session,
+        scenarioId: "landlord",
+        scenarioSnapshot: {
+          ...session.scenarioSnapshot,
+          id: "landlord",
+          title: "Landlord Conversation"
+        },
+        scenarioFamilyProgress: {
+          attemptMode: "variation",
+          recommendedNextMode: "replay"
+        }
+      });
+
+      const sessions = await store.listSessions("learner-review-test");
+
+      expect(sessions[0]?.scenarioFamilyProgress).toEqual({
+        attemptMode: "variation",
+        recommendedNextMode: "replay",
+        completedVariationIds: []
+      });
+    });
+  });
+
+  it("backfills currentTurnId for older persisted sessions without scenario state", async () => {
+    delete process.env.DATABASE_URL;
+
+    await withSessionHistoryDir(async (dir) => {
+      const legacySession = buildSession(
+        "legacy-session-1",
+        "2026-03-22T00:00:00.000Z",
+        "Try again with one short useful sentence.",
+        "Retry Register Mismatch",
+        "Me da medio kilo de tomates y un kilo de bananos?"
+      );
+      const {
+        scenarioState: _scenarioState,
+        scenarioProgress: _scenarioProgress,
+        scenarioFamilyProgress: _scenarioFamilyProgress,
+        ...rawLegacySession
+      } = legacySession;
+
+      await writeFile(
+        path.join(dir, "learner-review-test.json"),
+        `${JSON.stringify([rawLegacySession], null, 2)}\n`,
+        "utf8"
+      );
+
+      vi.resetModules();
+      const { getSessionStore } = await import("./session-store");
+      const store = getSessionStore();
+      const sessions = await store.listSessions("learner-review-test");
+      const review = await store.getLearnerReview("learner-review-test");
+
+      expect(sessions[0]?.scenarioSnapshot.turnId).toBe("grocery-turn-2");
+      expect(sessions[0]?.scenarioState?.currentTurnId).toBe("grocery-turn-2");
+      expect(sessions[0]?.scenarioProgress).toBeUndefined();
+      expect(sessions[0]?.scenarioFamilyProgress).toBeUndefined();
+      expect(review.recommendedDrills.length).toBeGreaterThan(0);
     });
   });
 });

@@ -10,6 +10,14 @@ import type {
   ScenarioRecord
 } from "@/lib/data/contracts";
 import { fetchBootstrap, fetchSessions, runCoach, transcribeAudio } from "@/lib/api";
+import {
+  currentTurnIdForSession,
+  deriveScenarioOutcome,
+  findLatestIncompleteSession,
+  findScenarioTurnIndex,
+  nextScenarioVariantId,
+  resumePromptForSession
+} from "@/lib/session-flow";
 import type {
   Difficulty,
   LearnerReviewSummary,
@@ -88,6 +96,22 @@ function practicePromptForDrill(drill: RecommendedDrill) {
   return drill.steps[0]?.prompt ?? drill.prompt;
 }
 
+function starterPromptForVariant(
+  scenario: ScenarioRecord | null,
+  variantId?: string
+) {
+  if (!scenario) {
+    return "";
+  }
+
+  return (
+    scenario.variants.find((variant) => variant.id === variantId)?.starterPrompt ??
+    scenario.starterPrompts[0] ??
+    scenario.turns[0]?.branchOptions[0]?.prompt ??
+    ""
+  );
+}
+
 export function SessionPlayground() {
   const [bootstrap, setBootstrap] = useState<BootstrapPayload | null>(null);
   const [input, setInput] = useState("Yo necesito ayuda con este formulario.");
@@ -97,6 +121,7 @@ export function SessionPlayground() {
   const [selectedScenarioId, setSelectedScenarioId] = useState("");
   const [selectedVariantId, setSelectedVariantId] = useState("");
   const [selectedTurnId, setSelectedTurnId] = useState("");
+  const [selectedBranchOptionId, setSelectedBranchOptionId] = useState("");
   const [selectedListeningPackId, setSelectedListeningPackId] = useState("");
   const [inputSource, setInputSource] = useState<SessionSource>("text");
   const [sessions, setSessions] = useState<PracticeSession[]>([]);
@@ -108,6 +133,7 @@ export function SessionPlayground() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [audioStatus, setAudioStatus] = useState<string | null>(null);
   const currentLearnerIdRef = useRef(selectedLearnerId);
+  const autoResumeLearnerIdRef = useRef<string | null>(null);
   const deferredInput = useDeferredValue(input);
 
   useEffect(() => {
@@ -176,6 +202,71 @@ export function SessionPlayground() {
     scenarioListeningPacks[0] ??
     null;
   const topRecurring = review?.recurringTags[0] ?? null;
+  const latestScenarioSession =
+    activeSession?.scenarioId === selectedScenarioId
+      ? activeSession
+      : sessions.find((session) => session.scenarioId === selectedScenarioId) ?? null;
+  const latestIncompleteSession = findLatestIncompleteSession(sessions);
+  const latestScenarioCurrentTurnId = latestScenarioSession
+    ? currentTurnIdForSession(latestScenarioSession)
+    : undefined;
+  const visibleScenarioProgress =
+    latestScenarioSession?.scenarioId === selectedScenarioId
+      ? latestScenarioSession.scenarioProgress
+      : undefined;
+  const activeScenarioProgress =
+    visibleScenarioProgress && latestScenarioCurrentTurnId === selectedTurnId
+      ? visibleScenarioProgress
+      : undefined;
+  const isCurrentScenarioComplete = activeScenarioProgress?.isComplete === true;
+  const selectedTurnIndex = findScenarioTurnIndex(currentScenario, selectedTurnId);
+  const selectedTurnProgressLabel =
+    currentScenario && selectedTurnIndex >= 0
+      ? `Turn ${selectedTurnIndex + 1} of ${currentScenario.turns.length}`
+      : "Choose a turn";
+  const selectedCompletedTurnIds =
+    activeScenarioProgress?.completedTurnIds ?? [];
+  const latestIncompleteScenario =
+    latestIncompleteSession && bootstrap
+      ? bootstrap.scenarios.find(
+          (scenario) => scenario.id === latestIncompleteSession.scenarioId
+        ) ?? null
+      : null;
+  const latestIncompleteTurnId = latestIncompleteSession
+    ? currentTurnIdForSession(latestIncompleteSession)
+    : undefined;
+  const latestIncompleteTurn =
+    latestIncompleteScenario?.turns.find((turn) => turn.id === latestIncompleteTurnId) ??
+    null;
+  const latestIncompleteTurnIndex = findScenarioTurnIndex(
+    latestIncompleteScenario,
+    latestIncompleteTurnId
+  );
+  const isResumeSelectionActive =
+    latestIncompleteSession?.scenarioId === selectedScenarioId &&
+    latestIncompleteTurnId === selectedTurnId;
+  const activeFeedbackScenario =
+    activeSession && bootstrap
+      ? bootstrap.scenarios.find((scenario) => scenario.id === activeSession.scenarioId) ??
+        null
+      : null;
+  const activeFeedbackOutcome = activeSession
+    ? deriveScenarioOutcome(activeSession)
+    : null;
+  const activeFeedbackCurrentTurnId = activeSession
+    ? currentTurnIdForSession(activeSession)
+    : undefined;
+  const activeFeedbackCurrentTurn =
+    activeFeedbackScenario?.turns.find(
+      (turn) => turn.id === activeFeedbackCurrentTurnId
+    ) ?? null;
+  const activeFeedbackAttemptedTurnIndex = activeSession
+    ? findScenarioTurnIndex(activeFeedbackScenario, activeSession.scenarioSnapshot.turnId)
+    : -1;
+  const activeFeedbackCurrentTurnIndex = findScenarioTurnIndex(
+    activeFeedbackScenario,
+    activeFeedbackCurrentTurnId
+  );
 
   useEffect(() => {
     if (!bootstrap || !currentScenario) {
@@ -202,6 +293,126 @@ export function SessionPlayground() {
         : defaultListeningPackId(bootstrap, currentScenario)
     );
   }, [bootstrap, currentScenario, scenarioListeningPacks]);
+
+  useEffect(() => {
+    setSelectedBranchOptionId((current) =>
+      currentTurn?.branchOptions.some((branch) => branch.id === current)
+        ? current
+        : currentTurn?.branchOptions[0]?.id ?? ""
+    );
+  }, [currentTurn]);
+
+  function loadIntoComposer(text: string, source: SessionSource = "text") {
+    setInput(text);
+    setInputSource(source);
+    setErrorMessage(null);
+  }
+
+  function selectScenarioFlow(options: {
+    scenarioId: string;
+    variantId?: string;
+    turnId?: string;
+    listeningPackId?: string;
+    mode?: PracticeMode;
+    difficulty?: Difficulty;
+  }) {
+    if (!bootstrap) {
+      return;
+    }
+
+    const scenario =
+      bootstrap.scenarios.find((candidate) => candidate.id === options.scenarioId) ??
+      null;
+
+    if (!scenario) {
+      return;
+    }
+
+    const nextVariantId =
+      scenario.variants.find((variant) => variant.id === options.variantId)?.id ??
+      defaultVariantId(scenario);
+    const nextTurn =
+      scenario.turns.find((turn) => turn.id === options.turnId) ??
+      scenario.turns[0] ??
+      null;
+    const scenarioPackIds = new Set(
+      listeningPacksForScenario(bootstrap, scenario.id).map((pack) => pack.id)
+    );
+    const nextListeningPackId =
+      (options.listeningPackId && scenarioPackIds.has(options.listeningPackId)
+        ? options.listeningPackId
+        : undefined) ??
+      nextTurn?.listeningPackId ??
+      defaultListeningPackId(bootstrap, scenario);
+
+    setSelectedScenarioId(scenario.id);
+    setSelectedVariantId(nextVariantId);
+    setSelectedTurnId(nextTurn?.id ?? "");
+    setSelectedBranchOptionId(nextTurn?.branchOptions[0]?.id ?? "");
+    setSelectedListeningPackId(nextListeningPackId);
+
+    if (options.mode) {
+      setMode(options.mode);
+    }
+
+    if (options.difficulty) {
+      setDifficulty(options.difficulty);
+    }
+  }
+
+  function handleResumeSession(session: PracticeSession, loadPrompt = true) {
+    const resumeTurnId =
+      currentTurnIdForSession(session) ?? session.scenarioSnapshot.turnId;
+
+    selectScenarioFlow({
+      scenarioId: session.scenarioId,
+      variantId: session.scenarioSnapshot.variantId,
+      turnId: resumeTurnId,
+      listeningPackId: session.scenarioSnapshot.listeningPackId,
+      mode: session.mode,
+      difficulty: session.difficulty
+    });
+    setActiveSession(session);
+
+    if (loadPrompt) {
+      loadIntoComposer(resumePromptForSession(session));
+    }
+  }
+
+  function handleReplaySamePath() {
+    if (!currentScenario) {
+      return;
+    }
+
+    setActiveSession(null);
+    selectScenarioFlow({
+      scenarioId: currentScenario.id,
+      variantId: selectedVariantId || defaultVariantId(currentScenario),
+      turnId: defaultTurnId(currentScenario)
+    });
+    loadIntoComposer(
+      starterPromptForVariant(
+        currentScenario,
+        selectedVariantId || defaultVariantId(currentScenario)
+      )
+    );
+  }
+
+  function handleTryVariation() {
+    if (!currentScenario) {
+      return;
+    }
+
+    const nextVariantId = nextScenarioVariantId(currentScenario, selectedVariantId);
+
+    setActiveSession(null);
+    selectScenarioFlow({
+      scenarioId: currentScenario.id,
+      variantId: nextVariantId,
+      turnId: defaultTurnId(currentScenario)
+    });
+    loadIntoComposer(starterPromptForVariant(currentScenario, nextVariantId));
+  }
 
   async function refreshLearnerSessions(
     learnerId: string,
@@ -250,6 +461,7 @@ export function SessionPlayground() {
 
   useEffect(() => {
     if (!selectedLearnerId) {
+      autoResumeLearnerIdRef.current = null;
       setSessions([]);
       setReview(null);
       setActiveSession(null);
@@ -292,9 +504,45 @@ export function SessionPlayground() {
     };
   }, [selectedLearnerId]);
 
+  useEffect(() => {
+    autoResumeLearnerIdRef.current = null;
+  }, [selectedLearnerId]);
+
+  useEffect(() => {
+    if (
+      !bootstrap ||
+      !selectedLearnerId ||
+      isLoadingSessions ||
+      autoResumeLearnerIdRef.current === selectedLearnerId
+    ) {
+      return;
+    }
+
+    const resumeSession = findLatestIncompleteSession(sessions);
+
+    autoResumeLearnerIdRef.current = selectedLearnerId;
+
+    if (!resumeSession) {
+      return;
+    }
+
+    handleResumeSession(resumeSession);
+  }, [bootstrap, isLoadingSessions, selectedLearnerId, sessions]);
+
   async function submitCoach(rawInput: string, source: SessionSource) {
     const trimmed = rawInput.trim();
     const requestLearnerId = selectedLearnerId;
+    const requestTurnId = selectedTurnId;
+    const requestScenarioId = selectedScenarioId;
+    const requestScenarioProgress =
+      latestScenarioSession?.scenarioId === requestScenarioId &&
+      latestScenarioCurrentTurnId === requestTurnId
+        ? latestScenarioSession.scenarioProgress
+        : undefined;
+    const requestScenarioFamilyProgress =
+      latestScenarioSession?.scenarioId === requestScenarioId
+        ? latestScenarioSession.scenarioFamilyProgress
+        : undefined;
 
     if (!trimmed || !requestLearnerId || !selectedScenarioId) {
       return;
@@ -313,6 +561,12 @@ export function SessionPlayground() {
         source,
         scenarioVariantId: selectedVariantId || undefined,
         scenarioTurnId: selectedTurnId || undefined,
+        scenarioState: requestTurnId
+          ? { currentTurnId: requestTurnId }
+          : undefined,
+        scenarioProgress: requestScenarioProgress,
+        scenarioFamilyProgress: requestScenarioFamilyProgress,
+        selectedBranchOptionId: selectedBranchOptionId || undefined,
         listeningPackId: selectedListeningPackId || undefined
       });
 
@@ -320,7 +574,22 @@ export function SessionPlayground() {
         return;
       }
 
+      const nextTurnId = session.scenarioState?.currentTurnId ?? requestTurnId;
+      const nextTurn =
+        bootstrap?.scenarios
+          .find((scenario) => scenario.id === requestScenarioId)
+          ?.turns.find((turn) => turn.id === nextTurnId) ?? null;
+
       setActiveSession(session);
+      setSelectedTurnId(nextTurnId);
+      setSelectedBranchOptionId((current) =>
+        session.scenarioProgress?.isComplete || nextTurnId !== requestTurnId
+          ? nextTurn?.branchOptions[0]?.id ?? ""
+          : current
+      );
+      if (nextTurn?.listeningPackId) {
+        setSelectedListeningPackId(nextTurn.listeningPackId);
+      }
       setInputSource(source);
       await refreshLearnerSessions(requestLearnerId, session.id);
     } catch (error) {
@@ -351,22 +620,8 @@ export function SessionPlayground() {
     setAudioStatus(null);
   }
 
-  function loadIntoComposer(text: string, source: SessionSource = "text") {
-    setInput(text);
-    setInputSource(source);
-    setErrorMessage(null);
-  }
-
   function handleBranchAdvance(branch: ScenarioBranchOptionRecord) {
-    const nextTurn =
-      currentScenario?.turns.find((turn) => turn.id === branch.nextTurnId) ?? null;
-
-    setSelectedTurnId(branch.nextTurnId);
-
-    if (nextTurn?.listeningPackId) {
-      setSelectedListeningPackId(nextTurn.listeningPackId);
-    }
-
+    setSelectedBranchOptionId(branch.id);
     loadIntoComposer(branch.prompt);
   }
 
@@ -465,6 +720,33 @@ export function SessionPlayground() {
               </label>
             </div>
 
+            {latestIncompleteSession && latestIncompleteScenario ? (
+              <div className="mt-4 rounded-[1.5rem] border border-ocean/20 bg-ocean/8 px-4 py-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ocean">
+                      {isResumeSelectionActive
+                        ? "Resuming saved scenario"
+                        : "Resume incomplete scenario"}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-coffee/80">
+                      {latestIncompleteScenario.title}
+                      {latestIncompleteTurn && latestIncompleteTurnIndex >= 0
+                        ? ` is waiting on Turn ${latestIncompleteTurnIndex + 1} of ${latestIncompleteScenario.turns.length}: ${latestIncompleteTurn.title}.`
+                        : " has a saved turn ready to continue."}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleResumeSession(latestIncompleteSession)}
+                    className="rounded-full bg-ocean px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#1f6f7f]"
+                  >
+                    {isResumeSelectionActive ? "Load resume prompt" : "Resume turn"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
             <div className="mt-4 grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="rounded-[1.5rem] border border-coffee/10 bg-sand/45 px-4 py-4">
                 <div className="flex flex-wrap gap-2">
@@ -481,6 +763,13 @@ export function SessionPlayground() {
                       Turn {currentTurn.title}
                     </span>
                   ) : null}
+                  {activeScenarioProgress ? (
+                    <span className="pill bg-coffee/8 text-coffee">
+                      {activeScenarioProgress.isComplete
+                        ? "Scenario complete"
+                        : `${activeScenarioProgress.completedTurnIds.length}/${activeScenarioProgress.totalTurns} complete`}
+                    </span>
+                  ) : null}
                 </div>
 
                 <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-palm">
@@ -495,6 +784,57 @@ export function SessionPlayground() {
                 <p className="mt-3 text-sm leading-6 text-coffee/75">
                   Goal: {currentScenario?.userGoal ?? "Choose a scenario to set the coaching target."}
                 </p>
+
+                {currentScenario ? (
+                  <div className="mt-4 rounded-[1.3rem] border border-coffee/10 bg-white/70 px-4 py-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                        Turn progress
+                      </p>
+                      <p className="text-sm font-semibold text-coffee">
+                        {isCurrentScenarioComplete ? "Path complete" : selectedTurnProgressLabel}
+                      </p>
+                    </div>
+                    <div className="mt-3 grid gap-3 md:grid-cols-3">
+                      {currentScenario.turns.map((turn, index) => {
+                        const isCompleted = selectedCompletedTurnIds.includes(turn.id);
+                        const isCurrent = turn.id === selectedTurnId && !isCompleted;
+                        const statusLabel = isCompleted
+                          ? "Complete"
+                          : isCurrent
+                            ? "Current"
+                            : index > selectedTurnIndex
+                              ? "Up next"
+                              : "Ready";
+
+                        return (
+                          <div
+                            key={turn.id}
+                            className={`rounded-[1.2rem] border px-4 py-3 ${
+                              isCompleted
+                                ? "border-palm/25 bg-palm/8"
+                                : isCurrent
+                                  ? "border-terracotta/35 bg-white"
+                                  : "border-coffee/10 bg-sand/35"
+                            }`}
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <p className="text-sm font-semibold text-coffee">
+                                Turn {index + 1}
+                              </p>
+                              <span className="text-xs uppercase tracking-[0.16em] text-coffee/55">
+                                {statusLabel}
+                              </span>
+                            </div>
+                            <p className="mt-2 text-sm leading-6 text-coffee/80">
+                              {turn.title}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : null}
 
                 <div className="mt-4 grid gap-4 md:grid-cols-3">
                   <label className="field">
@@ -709,10 +1049,45 @@ export function SessionPlayground() {
               </div>
             </div>
 
-            {currentTurn?.branchOptions.length ? (
+            {isCurrentScenarioComplete ? (
+              <div className="mt-4 rounded-[1.5rem] border border-palm/20 bg-palm/8 px-4 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
+                  Scenario complete
+                </p>
+                <p className="mt-2 text-sm leading-6 text-coffee/80">
+                  You finished this path through {currentScenario?.title ?? "the scenario"}.
+                  Replay the same setup, or switch to a different variant for a fresh prompt.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleReplaySamePath}
+                    className="rounded-full bg-palm px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#26584b]"
+                  >
+                    Replay same path
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleTryVariation}
+                    className="rounded-full bg-ocean px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#1f6f7f]"
+                  >
+                    Try variation
+                  </button>
+                </div>
+                <p className="mt-3 text-xs leading-5 text-coffee/65">
+                  Variation currently changes the setup and starter prompt while the
+                  turn path stays the same in the current scenario data.
+                </p>
+              </div>
+            ) : currentTurn?.branchOptions.length ? (
               <div className="mt-4 rounded-[1.5rem] border border-coffee/10 bg-white/70 px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-palm">
-                  Next branch options
+                  Branch options
+                </p>
+                <p className="mt-2 text-sm leading-6 text-coffee/75">
+                  The highlighted branch is what will happen after a successful reply.
+                  If the coach asks for a retry, you stay on this turn and keep that
+                  branch ready.
                 </p>
                 <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   {currentTurn.branchOptions.map((branch) => (
@@ -720,7 +1095,11 @@ export function SessionPlayground() {
                       key={branch.id}
                       type="button"
                       onClick={() => handleBranchAdvance(branch)}
-                      className="rounded-[1.3rem] border border-coffee/10 bg-sand/35 p-4 text-left transition hover:-translate-y-0.5 hover:border-terracotta/30 hover:bg-white"
+                      className={`rounded-[1.3rem] border p-4 text-left transition hover:-translate-y-0.5 hover:bg-white ${
+                        selectedBranchOptionId === branch.id
+                          ? "border-terracotta/40 bg-white"
+                          : "border-coffee/10 bg-sand/35 hover:border-terracotta/30"
+                      }`}
                     >
                       <p className="text-sm font-semibold text-coffee">
                         {branch.label}
@@ -826,7 +1205,65 @@ export function SessionPlayground() {
                   {activeSession.scenarioSnapshot.turnLabel}
                 </span>
               ) : null}
+              {activeSession.scenarioProgress ? (
+                <span className="pill bg-coffee/8 text-coffee">
+                  {activeSession.scenarioProgress.isComplete
+                    ? "Scenario complete"
+                    : `${activeSession.scenarioProgress.completedTurnIds.length}/${activeSession.scenarioProgress.totalTurns} complete`}
+                </span>
+              ) : null}
             </div>
+
+            {activeFeedbackOutcome ? (
+              <div className="rounded-[1.3rem] border border-terracotta/15 bg-terracotta/6 px-4 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-terracotta">
+                  {activeFeedbackOutcome === "retry"
+                    ? "Retry this turn"
+                    : activeFeedbackOutcome === "continue"
+                      ? "Continue to the next turn"
+                      : "Path complete"}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-coffee/80">
+                  {activeFeedbackOutcome === "retry"
+                    ? `You are still on ${activeSession.scenarioSnapshot.turnLabel ?? "this turn"}${
+                        activeFeedbackAttemptedTurnIndex >= 0 && activeSession.scenarioProgress
+                          ? ` (Turn ${activeFeedbackAttemptedTurnIndex + 1} of ${activeSession.scenarioProgress.totalTurns})`
+                          : ""
+                      }. Clean up this reply first, then the branch will move forward.`
+                    : activeFeedbackOutcome === "continue"
+                      ? `You cleared ${activeSession.scenarioSnapshot.turnLabel ?? "this turn"}${
+                          activeFeedbackCurrentTurn &&
+                          activeFeedbackCurrentTurnIndex >= 0 &&
+                          activeSession.scenarioProgress
+                            ? `. Next up is ${activeFeedbackCurrentTurn.title} (Turn ${
+                                activeFeedbackCurrentTurnIndex + 1
+                              } of ${activeSession.scenarioProgress.totalTurns}).`
+                            : "."
+                        }`
+                      : `You finished this path through ${activeSession.scenarioSnapshot.title}. Use Replay same path or Try variation in the scenario panel to keep practicing.`}
+                </p>
+
+                {activeFeedbackOutcome === "retry" ? (
+                  <button
+                    type="button"
+                    onClick={() => loadIntoComposer(activeSession.feedback.retryPrompt)}
+                    className="mt-3 rounded-full bg-terracotta px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#b85a2e]"
+                  >
+                    Load retry prompt
+                  </button>
+                ) : null}
+
+                {activeFeedbackOutcome === "continue" ? (
+                  <button
+                    type="button"
+                    onClick={() => loadIntoComposer(activeSession.feedback.followUpPrompt)}
+                    className="mt-3 rounded-full bg-ocean px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#1f6f7f]"
+                  >
+                    Load follow-up
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="feedback-block">
               <span>
@@ -1228,7 +1665,7 @@ export function SessionPlayground() {
               <button
                 key={session.id}
                 type="button"
-                onClick={() => setActiveSession(session)}
+                onClick={() => handleResumeSession(session, false)}
                 className="rounded-[1.5rem] border border-coffee/10 bg-white/70 p-4 text-left transition hover:-translate-y-0.5 hover:border-terracotta/30 hover:bg-white"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">

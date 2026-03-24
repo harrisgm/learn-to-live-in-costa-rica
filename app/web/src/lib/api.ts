@@ -5,6 +5,9 @@ import type {
   LearnerReviewSummary,
   PracticeMode,
   PracticeSession,
+  ScenarioFamilyProgress,
+  ScenarioProgress,
+  ScenarioState,
   SessionSource
 } from "@/lib/types";
 
@@ -49,6 +52,10 @@ export async function runCoach(payload: {
   feedbackMode?: FeedbackMode;
   scenarioVariantId?: string;
   scenarioTurnId?: string;
+  scenarioState?: ScenarioState;
+  scenarioProgress?: ScenarioProgress;
+  scenarioFamilyProgress?: ScenarioFamilyProgress;
+  selectedBranchOptionId?: string;
   listeningPackId?: string;
 }) {
   const response = await fetch("/api/coach", {

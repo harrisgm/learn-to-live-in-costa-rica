@@ -23,7 +23,10 @@ import type {
   RecurringTagSummary,
   RecommendedDrill,
   ReviewRecommendation,
+  ScenarioFamilyProgress,
+  ScenarioProgress,
   ScenarioSnapshot,
+  ScenarioState,
   SessionSource,
   VocabNote
 } from "@/lib/types";
@@ -319,6 +322,95 @@ function normalizeScenarioSnapshot(
     title: scenarioId,
     setting: "",
     userGoal: ""
+  };
+}
+
+function normalizeScenarioState(
+  value: unknown,
+  scenarioSnapshot: ScenarioSnapshot
+): ScenarioState | undefined {
+  if (value && typeof value === "object") {
+    const candidate = value as Partial<ScenarioState>;
+
+    if (
+      typeof candidate.currentTurnId === "string" &&
+      candidate.currentTurnId.trim()
+    ) {
+      return {
+        currentTurnId: candidate.currentTurnId.trim()
+      };
+    }
+  }
+
+  if (typeof scenarioSnapshot.turnId === "string" && scenarioSnapshot.turnId.trim()) {
+    return {
+      currentTurnId: scenarioSnapshot.turnId
+    };
+  }
+
+  return undefined;
+}
+
+function normalizeScenarioProgress(value: unknown): ScenarioProgress | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+
+  const candidate = value as Partial<ScenarioProgress>;
+  const completedTurnIds = Array.isArray(candidate.completedTurnIds)
+    ? candidate.completedTurnIds.flatMap((turnId) =>
+        typeof turnId === "string" && turnId.trim() ? [turnId.trim()] : []
+      )
+    : [];
+
+  if (typeof candidate.totalTurns !== "number" || candidate.totalTurns < 0) {
+    return undefined;
+  }
+
+  return {
+    completedTurnIds: Array.from(new Set(completedTurnIds)),
+    totalTurns: Math.max(0, Math.floor(candidate.totalTurns)),
+    isComplete: candidate.isComplete === true
+  };
+}
+
+function normalizeScenarioFamilyProgress(
+  value: unknown
+): ScenarioFamilyProgress | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+
+  const candidate = value as Partial<ScenarioFamilyProgress>;
+  const completedVariationIds = Array.isArray(candidate.completedVariationIds)
+    ? Array.from(
+        new Set(
+          candidate.completedVariationIds.flatMap((variationId) =>
+            typeof variationId === "string" && variationId.trim()
+              ? [variationId.trim()]
+              : []
+          )
+        )
+      )
+    : [];
+  const attemptMode =
+    candidate.attemptMode === "replay" || candidate.attemptMode === "variation"
+      ? candidate.attemptMode
+      : undefined;
+  const recommendedNextMode =
+    candidate.recommendedNextMode === "replay" ||
+    candidate.recommendedNextMode === "variation"
+      ? candidate.recommendedNextMode
+      : undefined;
+
+  if (!attemptMode && !recommendedNextMode && completedVariationIds.length === 0) {
+    return undefined;
+  }
+
+  return {
+    attemptMode,
+    recommendedNextMode,
+    completedVariationIds
   };
 }
 
@@ -735,7 +827,13 @@ function normalizeStoredSession(value: unknown): PracticeSession {
     Record<string, unknown> & {
       feedback?: unknown;
       scenario_context?: unknown;
+      scenario_family_progress?: unknown;
+      scenario_state?: unknown;
+      scenario_progress?: unknown;
+      scenarioFamilyProgress?: unknown;
       scenarioSnapshot?: unknown;
+      scenarioState?: unknown;
+      scenarioProgress?: unknown;
     };
 
   const scenarioId =
@@ -782,10 +880,23 @@ function normalizeStoredSession(value: unknown): PracticeSession {
     raw.scenarioSnapshot ?? raw.scenario_context,
     scenarioId
   );
+  const scenarioState = normalizeScenarioState(
+    raw.scenarioState ?? raw.scenario_state,
+    scenarioSnapshot
+  );
+  const scenarioProgress = normalizeScenarioProgress(
+    raw.scenarioProgress ?? raw.scenario_progress
+  );
+  const scenarioFamilyProgress = normalizeScenarioFamilyProgress(
+    raw.scenarioFamilyProgress ?? raw.scenario_family_progress
+  );
 
   return {
     ...base,
     scenarioSnapshot,
+    scenarioState,
+    scenarioProgress,
+    scenarioFamilyProgress,
     feedback: normalizeFeedback(raw.feedback, {
       ...base,
       scenarioTitle: scenarioSnapshot.title
@@ -1042,6 +1153,9 @@ class PostgresSessionStore implements SessionStore {
             difficulty text not null,
             scenario_id text not null,
             scenario_context jsonb not null default '{}'::jsonb,
+            scenario_family_progress jsonb not null default '{}'::jsonb,
+            scenario_state jsonb not null default '{}'::jsonb,
+            scenario_progress jsonb not null default '{}'::jsonb,
             source text not null,
             user_input text not null,
             feedback jsonb not null
@@ -1051,6 +1165,24 @@ class PostgresSessionStore implements SessionStore {
           this.pool.query(`
             alter table coaching_sessions
             add column if not exists scenario_context jsonb not null default '{}'::jsonb;
+          `)
+        )
+        .then(() =>
+          this.pool.query(`
+            alter table coaching_sessions
+            add column if not exists scenario_family_progress jsonb not null default '{}'::jsonb;
+          `)
+        )
+        .then(() =>
+          this.pool.query(`
+            alter table coaching_sessions
+            add column if not exists scenario_state jsonb not null default '{}'::jsonb;
+          `)
+        )
+        .then(() =>
+          this.pool.query(`
+            alter table coaching_sessions
+            add column if not exists scenario_progress jsonb not null default '{}'::jsonb;
           `)
         )
         .then(() => undefined);
@@ -1072,6 +1204,9 @@ class PostgresSessionStore implements SessionStore {
           difficulty,
           scenario_id,
           scenario_context,
+          scenario_family_progress,
+          scenario_state,
+          scenario_progress,
           source,
           user_input,
           feedback
@@ -1092,6 +1227,9 @@ class PostgresSessionStore implements SessionStore {
         difficulty: row.difficulty,
         scenarioId: row.scenario_id,
         scenario_context: row.scenario_context,
+        scenario_family_progress: row.scenario_family_progress,
+        scenario_state: row.scenario_state,
+        scenario_progress: row.scenario_progress,
         source: row.source,
         userInput: row.user_input,
         feedback: row.feedback
@@ -1121,11 +1259,14 @@ class PostgresSessionStore implements SessionStore {
           difficulty,
           scenario_id,
           scenario_context,
+          scenario_family_progress,
+          scenario_state,
+          scenario_progress,
           source,
           user_input,
           feedback
         )
-        values ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10::jsonb)
+        values ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::jsonb, $9::jsonb, $10::jsonb, $11, $12, $13::jsonb)
       `,
       [
         session.id,
@@ -1135,6 +1276,9 @@ class PostgresSessionStore implements SessionStore {
         session.difficulty,
         session.scenarioId,
         JSON.stringify(session.scenarioSnapshot),
+        JSON.stringify(session.scenarioFamilyProgress ?? {}),
+        JSON.stringify(session.scenarioState ?? {}),
+        JSON.stringify(session.scenarioProgress ?? {}),
         session.source,
         session.userInput,
         JSON.stringify(session.feedback)
@@ -1172,6 +1316,9 @@ export function createSession(
     difficulty: input.difficulty,
     scenarioId: input.scenarioId,
     scenarioSnapshot: input.scenarioSnapshot,
+    scenarioState: input.scenarioState,
+    scenarioProgress: input.scenarioProgress,
+    scenarioFamilyProgress: input.scenarioFamilyProgress,
     source: input.source,
     userInput: input.userInput,
     feedback: input.feedback
